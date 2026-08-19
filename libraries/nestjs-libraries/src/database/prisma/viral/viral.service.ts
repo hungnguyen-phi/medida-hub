@@ -2247,6 +2247,8 @@ TIN HIEU MOI (${cnt[p.code] || 0} content):
       ViralService.PRODUCE_FORMATS.includes(f)
     );
     if (!ids.length || !formats.length) return { queued: 0 };
+    // dọn xác 'processing' bỏ rơi trước — kẻo chúng ăn oan trần 40 job
+    await this._repo.failStaleProducts(orgId).catch(() => null);
     // chặn dồn job: tối đa 40 sản phẩm đang chạy / org
     const processing = await this._repo.countProcessingProducts(orgId);
     if (processing > 40) throw new Error('Đang sản xuất quá nhiều — đợi xong bớt rồi bấm tiếp.');
@@ -2292,7 +2294,11 @@ TIN HIEU MOI (${cnt[p.code] || 0} content):
   // Chạy tuần tự từng sản phẩm (tránh dội rate-limit Claude/Gemini/MiniMax).
   private async runProducts(orgId: string, productIds: string[]) {
     const failed: string[] = [];
-    for (const pid of productIds) {
+    for (let i = 0; i < productIds.length; i++) {
+      const pid = productIds[i];
+      // heartbeat: chạm updatedAt cả phần đuôi hàng đợi để watchdog
+      // failStaleProducts biết mẻ này còn sống, không giết oan job đang chờ
+      await this._repo.touchProducts(productIds.slice(i)).catch(() => null);
       const product = await this._repo.getProduct(orgId, pid).catch(() => null);
       if (!product || product.status !== 'processing') continue;
       try {
@@ -2952,7 +2958,9 @@ TIN HIEU MOI (${cnt[p.code] || 0} content):
     }
   }
 
-  listProducts(orgId: string) {
+  async listProducts(orgId: string) {
+    // mở tab Sản phẩm = dịp quét xác 'processing' bỏ rơi → hiện ❌ + Thử lại
+    await this._repo.failStaleProducts(orgId).catch(() => null);
     return this._repo.listProducts(orgId);
   }
 

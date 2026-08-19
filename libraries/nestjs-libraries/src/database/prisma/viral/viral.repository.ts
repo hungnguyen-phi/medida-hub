@@ -429,6 +429,42 @@ export class ViralRepository {
     });
   }
 
+  // Watchdog sản phẩm bỏ rơi: job sản xuất chạy TRONG RAM backend (fire-and-
+  // forget) nên restart/deploy giữa chừng là job chết mà DB vẫn 'processing'
+  // vĩnh viễn — UI quay "Đang sản xuất…" không có nút cứu. Quá N phút không
+  // nhúc nhích updatedAt (job sống luôn có heartbeat/checkpoint) → chuyển
+  // 'error' để hiện nút "↻ Thử lại". updatedAt null (hàng cổ) xét theo createdAt.
+  failStaleProducts(orgId: string, minutes = 45) {
+    const cutoff = new Date(Date.now() - minutes * 60 * 1000);
+    return this._products.model.viralProduct.updateMany({
+      where: {
+        organizationId: orgId,
+        status: 'processing',
+        deletedAt: null,
+        OR: [
+          { updatedAt: { lt: cutoff } },
+          { updatedAt: null, createdAt: { lt: cutoff } },
+        ],
+      },
+      data: {
+        status: 'error',
+        error:
+          'Bị ngắt giữa chừng (hệ thống khởi động lại trong lúc sản xuất) — bấm "↻ Thử lại" để chạy tiếp.',
+      },
+    });
+  }
+
+  // Heartbeat hàng đợi: chạm updatedAt các sản phẩm còn xếp hàng trong một mẻ
+  // runProducts để watchdog failStaleProducts không giết oan job đang chờ lượt.
+  touchProducts(ids: string[]) {
+    if (!ids.length) return Promise.resolve(null as any);
+    return this._products.model.viralProduct.updateMany({
+      where: { id: { in: ids }, status: 'processing' },
+      // ghi lại đúng giá trị cũ — @updatedAt vẫn nhảy theo mỗi lần update
+      data: { status: 'processing' },
+    });
+  }
+
   // Đếm sản phẩm đang chạy — chặn dồn job khi bấm Sản xuất liên tục.
   countProcessingProducts(orgId: string) {
     return this._products.model.viralProduct.count({
