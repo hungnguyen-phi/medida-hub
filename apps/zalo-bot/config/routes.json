@@ -1,0 +1,9 @@
+{
+  "_help": "Map nhóm Zalo -> Trang Facebook / Google Business. Cấu hình QUA DASHBOARD (tab Nhóm → Trang), không sửa tay. File khởi tạo để TRỐNG.",
+  "defaults": {
+    "debounceMs": 600000,
+    "maxWaitMs": 1800000,
+    "published": false
+  },
+  "routes": []
+}

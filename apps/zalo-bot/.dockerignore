@@ -1,0 +1,28 @@
+# Không đưa vào image: phụ thuộc, dữ liệu runtime, secret, công cụ local
+node_modules
+.git
+.gitignore
+
+# Dữ liệu & file ghi-runtime (đã nằm trên volume Coolify)
+data
+output
+*.log
+zalo-creds.json
+qr.png
+# LƯU Ý: KHÔNG loại config/routes.json — image cần nó làm FILE MẪU để seed
+# (lần đầu trên VPS, biết sẵn ID Trang để derive token Trang theo ID).
+
+# Secret (đặt qua biến môi trường Coolify, KHÔNG đóng vào image)
+.env
+.env.*
+!.env.example
+
+# Công cụ chạy local / tài liệu / artefact dev
+start.bat
+test
+scripts
+docs
+.impeccable
+.agents
+.claude
+.tmp_*

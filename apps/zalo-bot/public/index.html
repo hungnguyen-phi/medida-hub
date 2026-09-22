@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auto-Post · Zalo → Facebook</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMGY3ZDhjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmFhN2IzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0idXJsKCNnKSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQgNCkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0ibTIyIDItNyAyMC00LTktOS00WiIvPjxwYXRoIGQ9Ik0yMiAyIDExIDEzIi8+PC9nPjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* surfaces & ink */
+  --bg:#eef3f2; --surface:#ffffff; --surface-2:#f1f6f5; --border:#e0e8e6; --border-strong:#c8d6d3;
+  --text:#18302e; --ink-2:#3a544f; --ink-3:#45554f; --muted:#5a6b67; --label-ink:#3a4b47;
+  /* brand */
+  --primary:#0f7d8c; --primary-2:#0a5e69; --primary-tint:#dff0f0; --primary-glow:#cfeceb; --logo-2:#2aa7b3;
+  /* status */
+  --accent:#f5a524; --accent-ink:#3a2a00;
+  --success:#1a9e54; --success-2:#157a41; --success-tint:#e4f6ec;
+  --danger:#d9412b; --danger-2:#b3301f; --danger-tint:#fbeae7; --danger-tint-2:#f7dcd7;
+  --warn-bg:#fff5e6; --warn-border:#f6dca5; --warn-ink:#9a6400;
+  --dot-idle:#c4d2cf; --empty-ink:#bcccc8;
+  /* shadows & overlays */
+  --shadow:0 1px 2px rgba(16,30,28,.04),0 4px 16px rgba(16,30,28,.07);
+  --shadow-toast:0 10px 30px rgba(0,0,0,.2);
+  --scrim:rgba(15,23,32,.46);
+  --shadow-logo:0 6px 16px rgba(15,125,140,.32);
+  --ring-success:0 0 0 3px rgba(26,158,84,.18);
+  --topbar-bg:rgba(255,255,255,.7);
+  /* type scale */
+  --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-md:15px; --fs-lg:17px; --fs-xl:20px;
+  /* radius scale */
+  --r-xs:10px; --r-sm:12px; --radius:14px; --r-lg:20px; --r-full:99px;
+  /* z-index scale: sticky → sidebar → toast */
+  --z-sticky:5; --z-sidebar:30; --z-toast:50;
+  /* min touch target */
+  --tap:44px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:var(--fs-base);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,a.btn-primary,a.btn-ghost,a.btn-success,a.btn-danger{font-family:inherit;cursor:pointer;border:0;border-radius:var(--r-xs);padding:9px 15px;font-size:var(--fs-base);font-weight:600;display:inline-flex;align-items:center;gap:7px;text-decoration:none;transition:background .18s,box-shadow .18s,transform .05s,border-color .18s}
+button:active{transform:translateY(1px)}
+button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+button[disabled]{opacity:.55;cursor:not-allowed}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover:not([disabled]){background:var(--primary-2)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover:not([disabled]){background:var(--success-2)}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover:not([disabled]){background:var(--surface-2);border-color:var(--border-strong)}
+.btn-danger{background:var(--danger-tint);color:var(--danger)}.btn-danger:hover:not([disabled]){background:var(--danger-tint-2)}
+input,textarea,select{width:100%;background:#fff;border:1px solid var(--border);color:var(--text);border-radius:var(--r-xs);padding:10px 12px;font-size:var(--fs-base);font-family:inherit;transition:border-color .18s,box-shadow .18s}
+input:focus,textarea:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint)}
+textarea{min-height:96px;resize:vertical;line-height:1.6}
+svg{flex:none}
+.hide{display:none!important}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* ---- Login ---- */
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(1200px 600px at 50% -10%,var(--primary-glow) 0%,var(--bg) 55%)}
+.login-card{width:380px;max-width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:34px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.logo{width:42px;height:42px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--primary),var(--logo-2));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:var(--shadow-logo)}
+.brand h1{font-size:var(--fs-lg);margin:0;font-weight:700}.brand p{margin:0;font-size:var(--fs-xs);color:var(--muted)}
+.login-card h2{font-size:var(--fs-xl);margin:0 0 4px}.field{margin-top:14px}
+.field label{display:block;font-size:var(--fs-sm);font-weight:600;margin-bottom:6px;color:var(--label-ink)}
+.err{color:var(--danger);font-size:var(--fs-sm);margin-top:12px;min-height:18px}
+
+/* ---- App shell ---- */
+#appView{display:flex;min-height:100vh}
+.sidebar{width:248px;flex:none;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh}
+.side-brand{display:flex;align-items:center;gap:11px;padding:6px 8px 18px}
+.side-brand h1{font-size:var(--fs-md);margin:0;font-weight:700}.side-brand p{margin:0;font-size:var(--fs-xs);color:var(--muted)}
+.nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.nav button{justify-content:flex-start;width:100%;background:transparent;color:var(--ink-2);font-weight:500;padding:10px 12px;border-radius:var(--r-xs)}
+.nav button:hover{background:var(--surface-2);color:var(--text)}
+.nav button.active{background:var(--primary-tint);color:var(--primary-2);font-weight:600}
+.nav button.active svg{color:var(--primary)}
+.navgroup{font-size:var(--fs-xs);color:var(--muted);font-weight:600;margin:16px 10px 6px;padding-top:13px;border-top:1px solid var(--border)}
+.navgroup:first-child{margin-top:2px;padding-top:0;border-top:0}
+.setup-card{border-color:var(--primary)}
+.setup-step{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.setup-step:first-of-type{border-top:0}
+.setup-num{flex:none;width:30px;height:30px;border-radius:var(--r-full);background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.setup-step.done .setup-num{background:var(--success)}
+.setup-body{display:flex;flex-direction:column;min-width:0}
+.setup-body span{color:var(--muted);font-size:var(--fs-sm)}
+.setup-step>button,.setup-step>.pill{margin-left:auto;flex:none}
+.bottomnav{display:none}
+.nav .badge{margin-left:auto;background:var(--accent);color:var(--accent-ink);font-size:var(--fs-xs);font-weight:700;border-radius:var(--r-full);padding:1px 7px}
+.side-foot{border-top:1px solid var(--border);padding-top:12px;margin-top:8px;display:flex;flex-direction:column;gap:10px}
+.zpill{display:flex;align-items:center;gap:8px;font-size:var(--fs-xs);color:var(--muted);padding:0 6px}
+.dot{width:9px;height:9px;border-radius:var(--r-full);background:var(--dot-idle);flex:none}.dot.on{background:var(--success);box-shadow:var(--ring-success)}.dot.off{background:var(--danger)}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow-x:hidden}
+.topbar{height:64px;display:flex;align-items:center;gap:14px;padding:0 26px;border-bottom:1px solid var(--border);background:var(--topbar-bg);backdrop-filter:blur(8px);position:sticky;top:0;z-index:var(--z-sticky);overflow:hidden}
+.topbar h2{font-size:var(--fs-lg);margin:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.chip{font-size:var(--fs-xs);font-weight:600;padding:4px 11px;border-radius:var(--r-full);background:var(--surface-2);border:1px solid var(--border);color:var(--muted);white-space:nowrap;flex:none;max-width:55vw;overflow:hidden;text-overflow:ellipsis}
+.chip.warn{background:var(--warn-bg);border-color:var(--warn-border);color:var(--warn-ink)}
+.zalert{margin:14px 26px 0;padding:12px 14px;background:var(--danger-tint);border:1px solid var(--danger-tint-2);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow)}
+.zalert strong{display:block;color:var(--danger);margin-bottom:2px}.zalert p{margin:0;color:var(--ink-2);font-size:var(--fs-sm)}.zalert .row{flex:none}
+.content{padding:24px 26px;width:100%;max-width:none}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
+.card-head{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:6px}
+.card-head b{font-size:var(--fs-md)}.section-title{font-size:var(--fs-sm);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 10px}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:14px 0}
+.imgItem{position:relative}
+.imgItem img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-xs);border:1px solid var(--border);display:block}
+.imgItem input{font-size:var(--fs-xs);margin-top:6px;padding:7px 9px}
+.imgrm{position:absolute;top:5px;right:5px;width:30px;height:30px;min-height:0;padding:0;border-radius:var(--r-full);background:var(--scrim);color:#fff;display:flex;align-items:center;justify-content:center}
+.imgrm:hover{background:var(--danger)}
+.imgItem.removed img{opacity:.3;filter:grayscale(1)}
+.imgItem.removed input{opacity:.45}
+.imgItem.removed .imgrm{background:var(--success)}
+.imgItem.removed::after{content:"Đã bỏ";position:absolute;top:8px;left:8px;background:var(--danger);color:#fff;font-size:var(--fs-xs);font-weight:600;padding:2px 9px;border-radius:var(--r-full)}
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty svg{color:var(--empty-ink);margin-bottom:10px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:420px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);font-size:var(--fs-sm)}
+th{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.pill{font-size:var(--fs-xs);font-weight:600;padding:2px 9px;border-radius:var(--r-full);white-space:nowrap;display:inline-block}.pill.on{background:var(--success-tint);color:var(--success-2)}.pill.off{background:var(--danger-tint);color:var(--danger-2)}
+.sw{display:flex;align-items:center;gap:11px;cursor:pointer;font-size:var(--fs-base);padding:8px 0}
+.sw input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:44px;height:26px;border-radius:var(--r-full);background:var(--border-strong);position:relative;cursor:pointer;transition:background .2s;margin:0}
+.sw input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px var(--shadow-veil);transition:transform .2s}
+.sw input[type=checkbox]:checked{background:var(--primary)}
+.sw input[type=checkbox]:checked::after{transform:translateX(18px)}
+.sw input[type=checkbox]:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.sw.rsw-warn input[type=checkbox]:checked{background:var(--accent)}
+.logline{font-family:"SF Mono",ui-monospace,monospace;font-size:var(--fs-xs);color:var(--ink-3);border-bottom:1px solid var(--surface-2);padding:6px 0;display:flex;gap:12px}
+.logline time{color:var(--muted);flex:none}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--text);color:#fff;padding:12px 18px;border-radius:var(--r-sm);box-shadow:var(--shadow-toast);font-weight:500;opacity:0;transform:translateY(10px);transition:.25s;z-index:var(--z-toast)}
+.toast.show{opacity:1;transform:none}
+/* ---- Modal trong-app (thay confirm() thô) ---- */
+.modal-ov{position:fixed;inset:0;background:var(--scrim);z-index:var(--z-toast);display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fade .15s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-width:460px;padding:20px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:var(--shadow-toast);animation:modalup .22s cubic-bezier(.22,1,.36,1)}
+@keyframes modalup{from{transform:translateY(24px)}to{transform:none}}
+.modal h3{margin:0 0 8px;font-size:var(--fs-lg)}
+.modal-body{color:var(--muted);font-size:var(--fs-sm);line-height:1.55;margin-bottom:16px;white-space:pre-line}
+.modal-body b{color:var(--text)}
+.modal-actions{display:flex;flex-direction:column;gap:9px}
+.modal-actions button{width:100%;justify-content:center;min-height:48px;font-size:var(--fs-md)}
+@media(min-width:561px){.modal-ov{align-items:center;padding:20px}.modal{border-radius:var(--r-lg)}}
+/* ---- A11y & resilience ---- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link:focus{position:fixed;left:12px;top:12px;width:auto;height:auto;clip:auto;margin:0;z-index:var(--z-toast);background:var(--surface);color:var(--primary-2);font-weight:600;padding:10px 14px;border:1px solid var(--border);border-radius:var(--r-xs);box-shadow:var(--shadow)}
+.topbar h2:focus{outline:none}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
+.card-head b{overflow-wrap:anywhere;min-width:0}
+.errstate{text-align:center;padding:36px 20px;color:var(--muted)}
+.errstate b{display:block;color:var(--text);font-size:var(--fs-md);margin-bottom:4px}
+.cardmsg{font-size:var(--fs-sm);font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.cardmsg.err{color:var(--danger-2)}.cardmsg.busy{color:var(--muted)}
+.spin{width:13px;height:13px;border:2px solid var(--border-strong);border-top-color:var(--primary);border-radius:var(--r-full);display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fieldset{display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px}
+.fieldset>label{font-size:var(--fs-sm);font-weight:600;color:var(--label-ink)}
+.field-help{font-size:var(--fs-xs);color:var(--muted);margin:0}
+/* ---- Combobox gõ-để-tìm ---- */
+.combo{position:relative}
+.combo-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:var(--z-sticky);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-xs);box-shadow:var(--shadow);max-height:260px;overflow-y:auto;padding:4px}
+.combo-item{padding:9px 10px;border-radius:var(--r-xs);cursor:pointer}
+.combo-item:hover,.combo-item.hl{background:var(--primary-tint);color:var(--primary-2)}
+.combo-item .gid{display:block;font-size:var(--fs-xs);color:var(--muted)}
+.combo-item.hl .gid{color:var(--primary-2)}
+.combo-empty{padding:9px 10px;color:var(--muted);font-size:var(--fs-sm)}
+/* ---- Trường thu gọn ---- */
+.collapse-head{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;padding:4px 0}
+.collapse-head label{cursor:pointer;margin:0}
+.collapse-state{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.collapse-state .pill{font-size:var(--fs-xs)}
+.chev{display:inline-flex;align-items:center;transition:transform .15s}
+.chev.open{transform:rotate(90deg)}
+/* Thẻ nhóm gập gọn */
+.route-card{padding:14px 16px}
+.route-head{display:flex;align-items:center;gap:10px;cursor:pointer;min-height:40px}
+.route-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.route-badges{display:flex;align-items:center;gap:7px;flex:none}
+.route-badges .pill,.route-badges .chip{font-size:var(--fs-xs)}
+.route-body{padding-top:14px;margin-top:12px;border-top:1px solid var(--border)}
+.route-map-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:10px;align-items:start}
+.route-map-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.route-map-grid .fieldset{min-width:0}
+.route-map-grid input,.route-map-grid select{min-width:0}
+.swrow{display:flex;flex-wrap:wrap;gap:4px 28px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.swrow .rsw{flex:0 0 auto;padding:6px 0}
+.guide{padding:30px 24px}.guide h3{margin:0 0 6px;font-size:var(--fs-md)}
+.steps{margin:14px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{position:relative;padding:0 0 14px 38px;counter-increment:s;color:var(--muted)}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:var(--primary-tint);color:var(--primary-2);font-weight:700;font-size:var(--fs-sm);border-radius:var(--r-full)}
+.steps b{color:var(--text)}
+/* ---- Bản nháp kiểu Facebook ---- */
+.fbpost{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;max-width:860px}
+.fbpost-head{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.selwrap{margin-left:auto;display:flex;align-items:center;padding:6px}
+.selbox{width:20px;height:20px;cursor:pointer;accent-color:var(--primary)}
+.selbar{position:sticky;top:64px;z-index:var(--z-sticky);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;display:none;align-items:center;gap:10px 14px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.selbar.show{display:flex}
+.selall{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.selall input{width:18px;height:18px;accent-color:var(--primary)}
+.selacts{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.fbavatar{width:40px;height:40px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--primary),var(--logo-2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;font-size:var(--fs-md)}
+.fbpost-head b{font-size:var(--fs-md);display:block}.fbpost-head .sub{font-size:var(--fs-xs);color:var(--muted)}
+.fbpost-text{padding:2px 14px 6px;white-space:pre-wrap;line-height:1.55;overflow-wrap:anywhere}
+.fbpost-text.clamped{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;max-height:6.3em}
+.caption-more{padding:0 14px 12px;margin-top:-2px;display:flex;justify-content:flex-start}
+.caption-more button{background:transparent;color:var(--primary-2);border:0;padding:4px 0;font-size:var(--fs-sm);font-weight:700}
+.caption-more button:hover{text-decoration:underline}
+.fbmedia{display:grid;gap:2px;background:var(--border);grid-template-columns:1fr}
+.fbmedia.n2,.fbmedia.n4{grid-template-columns:1fr 1fr}
+.fbmedia.n3,.fbmedia.nx{grid-template-columns:1fr 1fr 1fr}
+.fbmedia img,.fbmedia video{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#000}
+.fbmedia .more{position:relative;display:block;min-width:0}
+.fbmedia .more img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.fbmedia .more::after{content:attr(data-more);position:absolute;inset:0;background:rgba(0,0,0,.5);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-lg)}
+.fbmedia .more{position:relative}
+.fbcaps{padding:8px 14px 2px;border-top:1px dashed var(--border)}
+.fbcaps>.section-title{padding:0}
+.fbcaps .collapse-head{min-height:42px}
+.fbcaps .collapse-head .btn-ghost{min-height:34px;padding:6px 10px;font-size:var(--fs-sm);font-weight:600}
+.fbcap{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--surface-2);font-size:var(--fs-sm);line-height:1.5}
+.fbcap:last-child{border-bottom:0}
+.capthumb{width:44px;height:44px;border-radius:var(--r-xs);object-fit:cover;flex:none;border:1px solid var(--border);background:#000}
+.fbcap b{color:var(--primary-2);display:block}
+.fbcomment{margin:10px 14px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);font-size:var(--fs-sm);overflow-wrap:anywhere}
+.fbcomment .who{color:var(--primary-2);font-weight:700}
+.approvalbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid var(--border);background:var(--surface)}
+.approvalsummary{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:var(--fs-sm)}
+.workbench{max-width:1180px;margin:0 auto}
+.post-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+.post-tabs{display:inline-grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px;box-shadow:var(--shadow)}
+.post-tabs button{background:transparent;border-radius:var(--r-xs);color:var(--muted);font-size:var(--fs-sm);padding:8px 12px;justify-content:center;white-space:nowrap}
+.post-tabs button.active{background:var(--primary);color:#fff}
+.post-stats{display:flex;gap:8px;flex-wrap:wrap}
+.post-statusline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:var(--fs-xs);color:var(--muted);margin-top:2px}
+.post-statusline .pill,.post-statusline .chip{font-size:var(--fs-xs)}
+.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start}
+.posts-grid .fbpost{max-width:none;margin:0;cursor:default}
+.posts-grid .fbpost-head{padding:12px}
+.posts-grid .fbavatar{width:34px;height:34px;font-size:var(--fs-sm)}
+.posts-grid .fbpost-head b{font-size:var(--fs-sm);line-height:1.35}
+.posts-grid .fbpost-text{font-size:var(--fs-sm);padding:0 12px 8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-height:4.8em}
+.posts-grid .caption-more,.posts-grid .fbcaps,.posts-grid .fbcomment,.posts-grid .approvaldetails,.posts-grid .fbpost-util,.posts-grid .fbedit,.posts-grid .post-links{display:none}
+.posts-grid .fbmedia{max-height:190px;overflow:hidden}
+.posts-grid .fbmedia img,.posts-grid .fbmedia video{aspect-ratio:4/3}
+.compact-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border)}
+.compact-actions .btn-ghost{min-height:36px;padding:7px 10px;font-size:var(--fs-sm)}
+.post-detail-backdrop{position:fixed;inset:0;background:var(--scrim);z-index:calc(var(--z-toast) - 1)}
+body.modal-lock{overflow:hidden}
+.post-modal-close{position:sticky;top:10px;float:right;z-index:1;margin:10px 10px -48px auto;width:38px;height:38px;min-height:0;padding:0;border-radius:var(--r-full);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:none;align-items:center;justify-content:center}
+.posts-grid .fbpost.post-expanded{position:fixed;z-index:var(--z-toast);left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,calc(100vw - 28px));max-height:calc(100vh - 28px);overflow:auto;cursor:default;margin:0}
+.posts-grid .fbpost.post-expanded .post-modal-close{display:flex}
+.posts-grid .fbpost.post-expanded .fbpost-head{padding:12px 14px}
+.posts-grid .fbpost.post-expanded .fbavatar{width:40px;height:40px;font-size:var(--fs-md)}
+.posts-grid .fbpost.post-expanded .fbpost-head b{font-size:var(--fs-md)}
+.posts-grid .fbpost.post-expanded .fbpost-text{display:block;font-size:var(--fs-base);padding:2px 14px 6px;max-height:none;overflow:visible}
+.posts-grid .fbpost.post-expanded .fbpost-text.clamped{display:-webkit-box;overflow:hidden;max-height:6.3em}
+.posts-grid .fbpost.post-expanded .caption-more{display:flex}
+.posts-grid .fbpost.post-expanded .fbcaps{display:block}
+.posts-grid .fbpost.post-expanded .fbcomment{display:block}
+.posts-grid .fbpost.post-expanded .approvaldetails{display:grid}
+.posts-grid .fbpost.post-expanded .fbpost-util{display:flex}
+.posts-grid .fbpost.post-expanded .fbedit:not(.hide){display:block!important}
+.posts-grid .fbpost.post-expanded .post-links{display:flex}
+.posts-grid .fbpost.post-expanded .fbmedia{max-height:none}
+.posts-grid .fbpost.post-expanded .fbmedia img,.posts-grid .fbpost.post-expanded .fbmedia video{aspect-ratio:1}
+.posts-grid .fbpost.post-expanded .compact-actions{display:none}
+.approvaldetails{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;padding:0 14px 12px;align-items:stretch}
+.channelbox{border:1px solid var(--border);border-radius:var(--r-sm);background:#fff;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.channelhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.channelhead b{font-size:var(--fs-md)}
+.channelmeta{font-size:var(--fs-xs);color:var(--muted);min-height:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.channelactions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.channelactions.single{grid-template-columns:1fr}
+.channelactions button{justify-content:center;min-height:40px;padding:8px 11px;font-size:var(--fs-sm);border-radius:var(--r-xs);line-height:1.25}
+.channelactions .btn-primary,.channelactions .btn-success{box-shadow:none}
+.channelactions .btn-ghost{background:#fff}
+.channelfoot{display:flex;justify-content:flex-end;border-top:1px solid var(--border);padding-top:5px;margin-top:auto}
+.fbpost-util{display:flex;gap:6px;padding:0 14px 12px}
+.btn-quiet{background:transparent;color:var(--muted);border:0;padding:7px 10px;font-size:var(--fs-sm);font-weight:500;min-height:0}
+.btn-quiet:hover:not([disabled]){background:var(--surface-2);color:var(--text)}
+.btn-quiet.danger{color:var(--danger);margin-left:auto}
+.btn-quiet.danger:hover:not([disabled]){background:var(--danger-tint);color:var(--danger-2)}
+.fbedit{padding:0 14px 12px}
+/* ---- Lắng nghe ---- */
+.live-head{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.bigcount{display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0;font-weight:600}
+.bigcount span{display:flex;align-items:center;gap:6px}
+.countdown{font-size:var(--fs-xl);font-weight:700;color:var(--primary-2);font-variant-numeric:tabular-nums}
+.live-feed{margin-top:6px}
+.live-feed .ev{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--surface-2);font-size:var(--fs-sm)}
+.live-feed .ev time{color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.live-feed .ev .k{flex:none}
+.stage{display:flex;align-items:center;gap:8px;font-size:var(--fs-md);font-weight:600;color:var(--primary-2);margin:6px 0}
+/* ---- Đã đăng ---- */
+.postmini{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.postmini img{width:60px;height:60px;object-fit:cover;border-radius:var(--r-xs);border:1px solid var(--border);background:#000}
+.postmini .vid{width:60px;height:60px;border-radius:var(--r-xs);border:1px solid var(--border);background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
+.postcap{white-space:pre-wrap;line-height:1.5;font-size:var(--fs-sm);color:var(--text);margin:6px 0;overflow-wrap:anywhere}
+.postlink{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sm);word-break:break-all}
+/* Nền mờ chạm-để-đóng menu (chỉ mobile) */
+.navbackdrop{position:fixed;inset:0;background:var(--scrim);z-index:calc(var(--z-sidebar) - 1);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.navbackdrop.show{opacity:1;visibility:visible}
+@media(min-width:761px){
+  .navbackdrop{display:none!important}
+  /* Kiểm soát chiều rộng trên desktop: nội dung không full-bleed, feed căn giữa */
+  .content{max-width:1080px;margin-inline:auto;width:100%}
+  .fbpost{margin-inline:auto}
+  /* Tab thiết lập (nhiều form) thu hẹp cho dòng đọc ngắn, dễ đọc */
+  #routes,#token,#gbp,#settings,#logs{max-width:880px;margin-inline:auto}
+}
+@media(max-width:760px){
+  .sidebar{position:fixed;left:-86vw;top:0;width:84vw;max-width:320px;height:100vh;z-index:var(--z-sidebar);transition:left .22s cubic-bezier(.22,1,.36,1);box-shadow:none}
+  .sidebar.open{left:0;box-shadow:6px 0 30px rgba(0,0,0,.25)}
+  .nav button{font-size:var(--fs-md);padding:13px 12px}
+  .menu-btn{display:inline-flex!important;min-width:var(--tap)}
+  .topbar{padding:0 12px;gap:10px;height:58px}.topbar h2{font-size:var(--fs-md)}
+  .zalert{margin:10px 12px 0;align-items:flex-start;flex-direction:column}.zalert .row{width:100%}.zalert button{flex:1;justify-content:center}
+  .content{padding:14px 12px}
+  .card{padding:14px;border-radius:var(--r-sm)}
+  /* Mỗi trường chiếm trọn một dòng cho dễ chạm */
+  .fieldset{min-width:100%}
+  .route-map-grid,.route-map-grid.two{grid-template-columns:1fr}
+  .card-head{flex-wrap:wrap}
+  .row{gap:8px}
+  /* Bài nháp & thẻ chiếm trọn bề ngang điện thoại */
+  .fbpost{max-width:none}
+  /* Thanh lọc "Mục phụ trách": nhãn trên, dropdown full-width dễ chạm 1 tay */
+  .post-pagefilter{gap:6px}
+  .post-pagefilter select{flex:1 1 100%;width:100%!important;min-width:0}
+  /* Vùng chạm ≥44px */
+  button,.nav button,.sw{min-height:var(--tap)}
+  input:not([type=checkbox]),textarea,select{min-height:var(--tap);font-size:16px}
+  .imgItem input{min-height:var(--tap)}
+  .imgs{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+  .postmini img,.postmini .vid{width:54px;height:54px}
+  .combo-list{max-height:50vh}
+  /* Đăng nhập gọn hơn */
+  #loginView{padding:12px}
+  .login-card{padding:22px 18px;border-radius:var(--radius)}
+  /* Nút trong bài xếp dọc, full bề ngang */
+  .approvalbar{align-items:flex-start;flex-direction:column}
+  .approvaldetails{grid-template-columns:1fr}
+  .channelactions{grid-template-columns:1fr}
+  /* Hàng nút hành động chung không tràn */
+  .row{row-gap:8px}
+  /* Bảng Token: ẩn cột ID dài cho đỡ chật (vẫn xem được trên máy tính) */
+  .tbl-token th:nth-child(2),.tbl-token td:nth-child(2){display:none}
+  table{min-width:0}
+  /* Ảnh bài to dễ nhìn: 2 cột trên điện thoại */
+  .fbmedia.n3,.fbmedia.nx{grid-template-columns:1fr 1fr}
+  /* Thanh chọn hàng loạt bám ĐÁY (trên bottom-nav), gần ngón cái */
+  .selbar{position:fixed;left:0;right:0;top:auto;bottom:calc(66px + env(safe-area-inset-bottom));margin:0;border-radius:var(--radius) var(--radius) 0 0;border-bottom:0}
+  .selacts{width:100%;margin-left:0;flex-wrap:wrap}
+  .selacts .btn-success,.selacts .btn-ghost{flex:1 1 calc(50% - 4px)}
+  .selacts .btn-danger{flex:1 1 100%}
+  /* Bottom-nav trong tầm ngón cái (chỉ mobile) */
+  .bottomnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:var(--z-sticky);background:var(--surface);border-top:1px solid var(--border-strong);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .bottomnav button{flex:1;flex-direction:column;gap:3px;background:transparent;color:var(--ink-2);font-weight:500;font-size:var(--fs-xs);min-height:54px;padding:5px 2px;border-radius:var(--r-xs);position:relative}
+  .bottomnav button svg{width:23px;height:23px}
+  .bottomnav button.active{color:var(--primary-2)}
+  .bottomnav button.active svg{color:var(--primary)}
+  .bnbadge{position:absolute;top:2px;left:calc(50% + 4px);background:var(--danger);color:#fff;font-size:var(--fs-xs);font-weight:700;min-width:17px;height:17px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .bnbadge.hide{display:none}
+  /* Chừa chỗ cho bottom-nav + thanh duyệt-loạt nổi (cao động theo --selbar-h) */
+  .content{padding-bottom:calc(76px + var(--selbar-h,0px))}
+  /* Nút phụ Sửa/Từ chối cũng phải đủ chạm ≥44px (thắng specificity .btn-quiet) */
+  .btn-quiet{min-height:44px;padding:11px 12px}
+  .fbpost-util{gap:10px;padding-bottom:14px}
+  /* Vùng chạm ≥44px: ô tích duyệt loạt, dòng chọn nhóm */
+  .selwrap{min-width:44px;min-height:44px;padding:12px;justify-content:center}
+  .selbox{width:24px;height:24px}
+  .combo-item{min-height:44px;display:flex;align-items:center}
+  /* Tách 'Bật' và 'Đăng công khai' thành 2 dòng riêng, tránh bật nhầm */
+  .swrow{flex-direction:column;gap:6px}
+  .swrow .rsw{flex:1 1 auto;min-height:46px}
+  /* Nút ✕ bỏ ảnh là hành động phá huỷ -> vùng chạm ≥44px */
+  .imgrm{width:44px;height:44px;top:6px;right:6px}
+  /* Đầu mục gập/mở dễ chạm một tay */
+  .collapse-head{min-height:44px;padding:9px 0}
+  .chev svg{width:17px;height:17px}
+}
+.rsw-warn:has(input:checked){color:var(--warn-ink)}
+/* Text chat dài (URL) tự xuống dòng trong feed Lắng nghe */
+.live-feed .ev{min-width:0}
+.live-feed .ev>span{min-width:0;overflow-wrap:anywhere}
+.menu-btn{display:none}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView">
+  <div class="login-card">
+    <div class="brand">
+      <div class="logo"><svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></div>
+      <div><h1>Auto-Post</h1><p>Zalo → Facebook</p></div>
+    </div>
+    <h2>Đăng nhập</h2>
+    <p class="muted">Bảng điều khiển đăng bài tự động</p>
+    <form id="loginForm" onsubmit="login(event)" novalidate>
+      <div class="field"><label for="u">Tài khoản</label><input id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="admin"></div>
+      <div class="field"><label for="p">Mật khẩu</label><input id="p" name="password" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      <div class="field" style="margin-top:20px"><button type="submit" id="loginBtn" class="btn-primary" style="width:100%;justify-content:center;padding:11px">Đăng nhập</button></div>
+      <div class="err" id="loginErr" role="alert" aria-live="assertive"></div>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appView" class="hide">
+  <a class="skip-link sr-only" href="#main">Bỏ qua tới nội dung</a>
+  <div id="navBackdrop" class="navbackdrop" onclick="toggleSidebar(false)" aria-hidden="true"></div>
+  <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+    <div class="side-brand">
+      <div class="logo" style="width:36px;height:36px"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></div>
+      <div><h1>Auto-Post</h1><p>Zalo → Facebook</p></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="zpill" role="status" aria-live="polite"><span class="dot" id="zdot" aria-hidden="true"></span><span id="zstat">Đang kết nối…</span></div>
+      <button class="btn-ghost" onclick="logout()"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>Đăng xuất</button>
+    </div>
+  </aside>
+  <main class="main" id="main" tabindex="-1">
+    <div class="topbar">
+      <button class="btn-ghost menu-btn" id="menuBtn" type="button" aria-label="Mở menu điều hướng" aria-expanded="false" aria-controls="sidebar" onclick="toggleSidebar()"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <h2 id="pageTitle" tabindex="-1">Chờ duyệt</h2>
+      <span style="flex:1"></span>
+      <span class="chip" id="modeChip" role="status" aria-live="polite"></span>
+    </div>
+    <div id="zalert" class="zalert hide" role="alert" aria-live="assertive">
+      <div><strong>Zalo mất kết nối</strong><p>Bot đang không nghe được ảnh mới từ nhóm. Hãy kết nối lại hoặc quét QR trong Cài đặt.</p></div>
+      <div class="row"><button class="btn-primary" onclick="zaloReconnect()">Kết nối lại</button><button class="btn-ghost" onclick="tab('settings')">Mở Cài đặt</button></div>
+    </div>
+    <div class="content">
+      <div id="drafts" class="view"></div>
+      <div id="live" class="view hide"></div>
+      <div id="posted" class="view hide"></div>
+      <div id="routes" class="view hide"></div>
+      <div id="token" class="view hide"></div>
+      <div id="gbp" class="view hide"></div>
+      <div id="settings" class="view hide"></div>
+      <div id="logs" class="view hide"></div>
+    </div>
+  </main>
+  <nav class="bottomnav" id="bottomnav" aria-label="Điều hướng nhanh"></nav>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const ICON={
+ drafts:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+ routes:'<circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M12 19h4.5a3.5 3.5 0 0 0 0-7h-8a3.5 3.5 0 0 1 0-7H12"/>',
+ token:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3"/>',
+ gbp:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>',
+ settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+ logs:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+ live:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+ posted:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+ x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ checkCircle:'<path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/>',
+ pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+ trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+ film:'<path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/>',
+ sparkles:'<path d="M9.94 4.66 11 2l1.06 2.66L14.7 5.7 12 6.78 11 9.5 9.94 6.78 7.3 5.7Z"/><path d="M19 11l.7 1.8 1.8.7-1.8.7L19 16l-.7-1.8-1.8-.7 1.8-.7Z"/><path d="M5 13l.7 1.8 1.8.7-1.8.7L5 18l-.7-1.8L2.5 15.5l1.8-.7Z"/>',
+ repeat:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+ clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+ image:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+ ext:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+ refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/>',
+ alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+ chevron:'<path d="m9 18 6-6-6-6"/>'
+};
+const ic=(k,sz)=>svg(ICON[k]).replace('width="18" height="18"',`width="${sz||16}" height="${sz||16}"`);
+const NAV=[
+ ['Vận hành hằng ngày',[['drafts','Bài viết'],['live','Lắng nghe']]],
+ ['Thiết lập (làm một lần)',[['routes','Nhóm → Trang'],['token','Token Facebook'],['gbp','Google Business'],['settings','Cài đặt'],['logs','Nhật ký']]],
+];
+const TABS=NAV.flatMap(g=>g[1]);
+const HASH_BY_TAB={drafts:'bai-viet',live:'lang-nghe',posted:'bai-viet',routes:'nhom-trang',token:'token-facebook',gbp:'google-business',settings:'cai-dat',logs:'nhat-ky'};
+const TAB_BY_HASH={...Object.fromEntries(Object.entries(HASH_BY_TAB).map(([k,v])=>[v,k])), 'bai-viet':'drafts', 'cho-duyet':'drafts', 'da-duyet':'drafts'};
+function tabFromHash(){return TAB_BY_HASH[String(location.hash||'').replace(/^#/,'')]||'drafts'}
+const svg=p=>'<svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+function toggleSidebar(force){const sb=$('#sidebar');const open=sb.classList.toggle('open',force);const b=$('#menuBtn');if(b)b.setAttribute('aria-expanded',String(open));const bd=$('#navBackdrop');if(bd)bd.classList.toggle('show',open)}
+function buildNav(){$('#nav').innerHTML=NAV.map(([g,items])=>`<p class="navgroup">${g}</p>`+items.map(([k,n])=>`<button data-t="${k}" onclick="tab('${k}')">${svg(ICON[k])}<span>${n}</span>${k==='drafts'?'<span class="badge hide" id="navBadge">0</span>':''}</button>`).join('')).join('');buildBottomNav()}
+function buildBottomNav(){const items=[['drafts','Bài viết'],['live','Lắng nghe']];
+ $('#bottomnav').innerHTML=items.map(([k,n])=>`<button data-bt="${k}" onclick="tab('${k}')">${svg(ICON[k])}<span>${n}</span>${k==='drafts'?'<span class="bnbadge hide" id="bnBadge">0</span>':''}</button>`).join('')+`<button onclick="toggleSidebar(true)" aria-label="Mở menu đầy đủ">${svg(ICON.settings)}<span>Menu</span></button>`}
+
+let cur='drafts';
+function tab(t,{fromHash=false}={}){if(!HASH_BY_TAB[t])t='drafts';if(!fromHash&&location.hash!=='#'+HASH_BY_TAB[t]){location.hash=HASH_BY_TAB[t];return}
+ cur=t;document.querySelectorAll('.nav button').forEach(b=>{const on=b.dataset.t===t;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ document.querySelectorAll('#bottomnav button').forEach(b=>b.classList.toggle('active',b.dataset.bt===t));
+ document.querySelectorAll('.view').forEach(v=>v.classList.add('hide'));$('#'+t).classList.remove('hide');
+ const pt=$('#pageTitle');pt.textContent=(TABS.find(x=>x[0]===t)||[])[1]||'';toggleSidebar(false);pt.focus();render()}
+
+let toastT;function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2600)}
+// Modal trong-app: actions=[{label,value,cls}]; trả Promise -> value của nút bấm (null nếu chạm ra ngoài)
+function modal(title,body,actions){return new Promise(resolve=>{
+ const ov=document.createElement('div');ov.className='modal-ov';
+ ov.innerHTML='<div class="modal" role="dialog" aria-modal="true"><h3></h3>'+(body?'<div class="modal-body"></div>':'')+'<div class="modal-actions"></div></div>';
+ ov.querySelector('h3').textContent=title;
+ if(body)ov.querySelector('.modal-body').innerHTML=body;
+ const close=(v)=>{ov.remove();document.removeEventListener('keydown',onKey);resolve(v)};
+ const onKey=(e)=>{if(e.key==='Escape')close(null)};
+ const av=ov.querySelector('.modal-actions');
+ actions.forEach(a=>{const b=document.createElement('button');b.className=a.cls||'btn-ghost';b.textContent=a.label;b.onclick=()=>close(a.value);av.appendChild(b)});
+ ov.addEventListener('mousedown',e=>{if(e.target===ov)close(null)});
+ document.addEventListener('keydown',onKey);
+ document.body.appendChild(ov);const f=av.querySelector('button');if(f)f.focus();
+})}
+function confirmModal(title,body,okLabel,okCls){return modal(title,body,[{label:'Huỷ',value:false,cls:'btn-ghost'},{label:okLabel||'Đồng ý',value:true,cls:okCls||'btn-primary'}])}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function api(p,m,b){const r=await fetch(p,{method:m||'GET',headers:{'content-type':'application/json'},body:b?JSON.stringify(b):undefined});
+ if(r.status===401){clearInterval(_statusTimer);show(false);throw new Error('Phiên hết hạn')}const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j}
+function show(in_){$('#loginView').classList.toggle('hide',in_);$('#appView').classList.toggle('hide',!in_)}
+
+async function login(e){if(e)e.preventDefault();$('#loginErr').textContent='';const btn=$('#loginBtn');btn.disabled=true;
+ try{await api('/api/login','POST',{user:$('#u').value,pass:$('#p').value});show(true);boot()}
+ catch(err){$('#loginErr').textContent=err.message;$('#p').focus()}
+ finally{btn.disabled=false}}
+async function logout(){clearInterval(_statusTimer);try{await api('/api/logout','POST')}catch(e){}show(false);const u=$('#u');if(u)u.focus()}
+
+let _statusTimer;
+async function boot(){buildNav();tab(tabFromHash(),{fromHash:true});await status();startPolling();
+ // Nạp sẵn nhóm + Trang ở nền để dropdown hiện ngay khi mở tab Nhóm→Page
+ Promise.all([ensureGroups(),ensureFbPages(),ensureGbpBusinesses()]).then(()=>{if(cur==='routes')paintRoutes()});}
+function startPolling(){clearInterval(_statusTimer);_statusTimer=setInterval(status,5000)}
+// Dừng polling khi tab ẩn (đỡ hao pin), chạy lại khi quay lại
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden){clearInterval(_statusTimer)}
+ else if(!$('#appView').classList.contains('hide')){status();startPolling()}});
+window.addEventListener('hashchange',()=>{if(!$('#appView').classList.contains('hide'))tab(tabFromHash(),{fromHash:true})});
+async function status(){try{const s=await api('/api/status');window._st=s;
+ const ok=s.zaloConnected;
+ // Kết nối lại (có thể là tài khoản khác) -> xoá cache nhóm/Trang để nạp lại danh sách mới
+ if(ok&&window._zaloWasDown){window._zgroups=undefined;window._fbpages=undefined;window._gbps=undefined;if(cur==='routes')renderRoutes()}
+ window._zaloWasDown=!ok;
+ $('#zdot').className='dot '+(ok?'on':'off');
+ $('#zstat').textContent=ok?'Zalo đã kết nối':(s.zaloRelogging?'Zalo: chờ quét QR (vào Cài đặt)':'Zalo mất kết nối');
+ const za=$('#zalert');
+ if(za){
+  za.classList.toggle('hide',ok);
+  const title=za.querySelector('strong'),body=za.querySelector('p'),btn=za.querySelector('button');
+  if(title)title.textContent=s.zaloRelogging?'Zalo đang chờ đăng nhập lại':'Zalo mất kết nối';
+  if(body)body.textContent=s.zaloRelogging?'Mở Cài đặt và quét QR nếu mã đã hiện. Trong lúc này bot chưa nghe được ảnh mới.':'Bot đang không nghe được ảnh mới từ nhóm. Bấm Kết nối lại để thử dùng phiên đã lưu.';
+  if(btn)btn.disabled=!!s.zaloRelogging;
+ }
+ $('#modeChip').textContent=(s.settings.paused?'Tạm dừng':'Theo từng kênh')+' · '+s.pendingCount+' cần xử lý';
+ $('#modeChip').className='chip'+(s.settings.paused?' warn':'');
+ const b=$('#navBadge');if(b){b.textContent=s.pendingCount;b.classList.toggle('hide',!s.pendingCount)}
+ const bn=$('#bnBadge');if(bn){bn.textContent=s.pendingCount;bn.classList.toggle('hide',!s.pendingCount)}
+ // Tự nạp bài mới khi đang ở tab Chờ duyệt — chỉ khi an toàn (không đang sửa/đăng)
+ if(cur==='drafts'&&window._lastPending!=null&&s.pendingCount>window._lastPending&&!document.querySelector('.fbedit:not(.hide)')&&_inflight.size===0){renderDrafts()}
+ window._lastPending=s.pendingCount;
+ }catch(e){}}
+
+async function render(){closePostDetail(); // dọn lớp nền tối/khóa cuộn của popup Chi tiết trước khi vẽ lại (tránh kẹt màn hình tối)
+ const fn={drafts:renderDrafts,live:renderLive,posted:renderPosted,routes:renderRoutes,token:renderToken,gbp:renderGbp,settings:renderSettings,logs:renderLogs}[cur];
+ try{await fn()}
+ catch(e){if(e.message==='Phiên hết hạn')return;$('#'+cur).innerHTML=`<div class="card"><div class="errstate"><b>Không tải được dữ liệu</b><div>${esc(e.message)}</div><div class="row" style="justify-content:center;margin-top:14px"><button class="btn-ghost" onclick="render()">Thử lại</button></div></div></div>`}}
+
+async function setupBanner(){
+ if(localStorage.getItem('hideSetup'))return '';
+ let st=window._st||{};try{st=await api('/api/status');window._st=st}catch(e){}
+ const routes=st.routes||[];
+ const configuredRoutes=routes.filter(r=>r&&r.threadId&&r.fanpageId&&r.enabled!==false);
+ let hasToken=configuredRoutes.some(r=>r.hasToken);
+ if(!hasToken){try{const t=await api('/api/token');hasToken=!!t.appId&&!!t.hasSecret&&t.pages&&t.pages.some(p=>p.hasToken)}catch(e){}}
+ const hasConfiguredRoute=configuredRoutes.length>0;
+ const hasWork=(st.pendingCount||0)>0;
+ const s1=!!st.zaloConnected;               // bước 1 = Zalo THỰC SỰ đã kết nối
+ const s2=hasToken||hasConfiguredRoute;
+ const s3=hasConfiguredRoute;
+ if(s1&&s2&&s3)return '';                    // xong cả 3 -> tự ẩn
+ const step=(done,num,title,desc,key,btn)=>`<div class="setup-step${done?' done':''}"><div class="setup-num">${done?ic('check',17):num}</div><div class="setup-body"><b>${title}</b><span>${desc}</span></div>${done?'<span class="pill on">Xong</span>':`<button class="btn-ghost" onclick="tab('${key}')">${btn}</button>`}</div>`;
+ return `<div class="card setup-card"><div class="card-head"><b>Bắt đầu — 3 bước thiết lập</b><button class="btn-quiet" style="margin-left:auto" onclick="hideSetup()">Ẩn hướng dẫn</button></div>
+  <p class="muted" style="margin:0 0 12px">Làm theo thứ tự, mỗi bước một lần. Xong cả 3 là bot tự gom ảnh và đưa bài vào đây để bạn duyệt.</p>
+  ${step(s1,'1','Kết nối Zalo','Đăng nhập tài khoản Zalo đã ở trong nhóm cần lấy ảnh','settings','Mở Cài đặt')}
+  ${step(s2,'2','Cấp Token Facebook','Cho phép hệ thống đăng bài lên Trang Facebook','token','Mở Token')}
+  ${step(s3,'3','Nối Nhóm → Trang','Chọn nhóm Zalo nào sẽ đăng tới Trang Facebook nào','routes','Mở Nhóm → Trang')}
+  </div>`;
+}
+function hideSetup(){localStorage.setItem('hideSetup','1');render()}
+function statusPill(status,published){
+ if(status==='posted')return published===false?`<span class="pill off">Nháp Facebook</span>`:`<span class="pill on">Đã công khai</span>`;
+ if(status==='rejected')return `<span class="pill off">Đã bỏ</span>`;
+ return `<span class="chip">Chờ duyệt</span>`;
+}
+let _postFilter=localStorage.getItem('postFilter')||'needs';
+let _pageFilter=localStorage.getItem('folderFilter')||localStorage.getItem('pageFilter')||'';
+async function renderDrafts(){const all=await api('/api/posts');const el=$('#drafts');const banner=await setupBanner();
+ if(window._fbpages===undefined){ensureFbPages().then(()=>{if(cur==='drafts')renderDrafts()})} // nạp tên Trang cho fallback folder
+ if(window._st===undefined){try{window._st=await api('/api/status')}catch(e){}} // cần routes[].folder để dựng bộ lọc Mục
+ // MỤC/FOLDER phụ trách: ưu tiên "Mục" cấu hình ở Nhóm→Trang (gom nhiều Trang cho 1 người); nếu trống -> dùng tên Trang.
+ const routes=(window._st&&window._st.routes)||[];
+ const folderByThread={};routes.forEach(r=>{if(r&&r.threadId)folderByThread[String(r.threadId)]=(r.folder||'').trim()});
+ const pageNameOf=(d)=>{const p=(window._fbpages||[]).find(x=>String(x.fanpageId)===String(d.fanpageId));return (p&&p.name)?p.name:(d.routeLabel||(d.fanpageId?('Trang '+d.fanpageId):'Khác'))};
+ const folderOf=(d)=>folderByThread[String(d.threadId)]||pageNameOf(d);
+ // Danh sách mục = mục cấu hình ở Nhóm→Trang (kể cả chưa có bài) + mục suy ra từ bài đã có.
+ const cfgFolders=routes.map(r=>((r&&r.folder)||'').trim()).filter(Boolean);
+ const optSet={};all.forEach(d=>{const f=folderOf(d);if(f)optSet[f]=1});cfgFolders.forEach(f=>{optSet[f]=1});
+ const pageList=Object.keys(optSet).sort((a,b)=>a.localeCompare(b,'vi')).map(f=>[f,f]);
+ // Hiện bộ lọc khi có ≥2 mục HOẶC đã cấu hình ít nhất 1 mục (để thấy ngay khi vừa thiết lập).
+ const showFolderFilter=pageList.length>1||cfgFolders.length>0;
+ if(_pageFilter&&!optSet[_pageFilter])_pageFilter='';
+ const inScope=_pageFilter?all.filter(d=>folderOf(d)===_pageFilter):all;
+ const needs=inScope.filter(d=>d.queueStatus==='pending');
+ const done=inScope.filter(d=>d.queueStatus!=='pending');
+ if(_postFilter==='needs'&&!needs.length&&done.length)_postFilter='all';
+ const ds=_postFilter==='needs'?needs:(_postFilter==='done'?done:inScope);
+ const toolbar=`${showFolderFilter?`<div class="post-pagefilter" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap"><span class="muted" style="font-size:var(--fs-sm);font-weight:600">${ic('routes',15)} Mục phụ trách:</span><select aria-label="Lọc bài theo mục phụ trách" onchange="setPageFilter(this.value)" style="width:auto;min-width:190px"><option value="">— Tất cả mục —</option>${pageList.map(([fid,name])=>`<option value="${esc(fid)}" ${_pageFilter===fid?'selected':''}>${esc(name)}</option>`).join('')}</select>${_pageFilter?`<span class="chip">đang xem: ${esc(_pageFilter)}</span>`:''}</div>`:''}
+ <div class="post-toolbar">
+  <div class="post-tabs" role="tablist" aria-label="Lọc bài viết">
+   <button class="${_postFilter==='needs'?'active':''}" onclick="setPostFilter('needs')">Cần xử lý ${needs.length?`(${needs.length})`:''}</button>
+   <button class="${_postFilter==='all'?'active':''}" onclick="setPostFilter('all')">Tất cả ${inScope.length?`(${inScope.length})`:''}</button>
+   <button class="${_postFilter==='done'?'active':''}" onclick="setPostFilter('done')">Đã xong ${done.length?`(${done.length})`:''}</button>
+  </div>
+  <div class="post-stats"><span class="pill ${needs.length?'off':'on'}">${needs.length?needs.length+' cần xử lý':'Không còn chờ'}</span><span class="chip">${done.length} đã xong</span></div>
+ </div>`;
+ if(!all.length){_sel.clear();el.innerHTML=`<div class="workbench">${banner}${toolbar}<div class="card"><div class="empty">${svg(ICON.drafts).replace('18','40')}<div>Chưa có bài viết nào.<br>${banner?'Hoàn tất 3 bước ở trên để bắt đầu.':'Khi có người gửi ảnh vào nhóm Zalo, bài sẽ tự hiện ở đây.'}</div></div></div></div>`;return}
+ if(!ds.length){_sel.clear();el.innerHTML=`<div class="workbench">${banner}${toolbar}<div class="card"><div class="empty">${svg(ICON.drafts).replace('18','40')}<div>Không có bài nào trong bộ lọc này.</div></div></div></div>`;return}
+ const ids=new Set(ds.filter(d=>d.queueStatus==='pending'&&(((d.approvals||{}).facebook||{}).status||'pending')==='pending').map(d=>d.id));_sel=new Set([..._sel].filter(id=>ids.has(id)));
+ const selbar=`<div id="selbar" class="selbar${_sel.size?' show':''}"><label class="selall"><input type="checkbox" onchange="selAll(this.checked)"> Chọn tất cả</label><span class="muted"><b id="selcount">${_sel.size}</b> bài đã chọn</span><div class="selacts"><button class="btn-success" onclick="bulkApprove(true)">Đăng công khai</button><button class="btn-ghost" onclick="bulkApprove(false)">Lưu nháp</button><button class="btn-danger" onclick="bulkReject()">Từ chối</button></div></div>`;
+ el.innerHTML=`<div class="workbench">${banner}${toolbar}${selbar}<div class="posts-grid">`+ds.map(d=>{
+  const rt=routes.find(r=>String(r.threadId)===String(d.threadId))||{};
+  const pageName=esc(d.routeLabel||rt.label||d.threadId);
+  const initial=esc((String(d.routeLabel||rt.label||'F').trim()[0]||'F').toUpperCase());
+  const comment=d.comment||rt.comment||'';
+  const pub=(d.published!==undefined?d.published:rt.published)?true:false;
+  const approvals=d.approvals||{};
+  const fbStatus=(approvals.facebook&&approvals.facebook.status)||'pending';
+  const gbpId=d.gbpLocationId||rt.gbpLocationId||'';
+  const gbpStatus=gbpId?((approvals.gbp&&approvals.gbp.status)||'pending'):'none';
+  const fbComplete=fbStatus!=='pending'&&!(fbStatus==='posted'&&!pub);
+  const doneCount=(fbComplete?1:0)+(gbpId&&gbpStatus!=='pending'?1:0);
+  const totalCount=1+(gbpId?1:0);
+  const isActive=d.queueStatus==='pending';
+  const inPending=d.inPending!==false&&isActive;
+  const statusText=isActive?'Cần xử lý':'Đã xong';
+  const fbLinks=((approvals.facebook&&approvals.facebook.links)||d.links||[]).filter(Boolean);
+  const gbpLinks=((approvals.gbp&&approvals.gbp.links)||[]).filter(Boolean);
+  const gbpManage=gbpId?`https://business.google.com/n/${esc(gbpId)}/posts`:'';
+  const linkRow=(fbLinks.length||gbpStatus==='posted')?`<div class="row post-links" style="gap:8px;margin:0 14px 12px">
+    ${fbLinks.map(l=>`<a class="btn-ghost postlink" href="${esc(l)}" target="_blank" rel="noopener">${ic('ext',14)} Facebook</a>`).join('')}
+    ${gbpLinks.length?gbpLinks.map(l=>`<a class="btn-ghost postlink" href="${esc(l)}" target="_blank" rel="noopener">${ic('ext',14)} Google</a>`).join(''):(gbpStatus==='posted'&&gbpManage?`<a class="btn-ghost postlink" href="${gbpManage}" target="_blank" rel="noopener">${ic('ext',14)} Google Business</a>`:'')}
+   </div>`:'';
+  const imgs=d.imageUrls||[];const n=imgs.length;const shown=imgs.slice(0,5);const more=n-shown.length;const sn=shown.length;const cls=sn===2?'n2':sn===3?'n3':sn===4?'n4':(sn>4?'nx':'');
+  const longCaption=String(d.caption||'').length>260||String(d.caption||'').split('\n').length>5;
+  return `<div class="fbpost" data-card="${d.id}" data-post="${d.id}">
+   <div class="fbpost-head"><div class="fbavatar" aria-hidden="true">${initial}</div>
+    <div><b>${pageName}</b><span class="sub">${statusText} · ${new Date(d.createdAt).toLocaleString('vi-VN')} · ${n} ảnh${d.videoUrls&&d.videoUrls.length?(' + '+d.videoUrls.length+' video'):''}${d.droppedCount?(' · đã lọc bỏ '+d.droppedCount):''}</span><div class="post-statusline"><span class="pill ${isActive?'off':'on'}">${statusText}</span><span>${doneCount}/${totalCount} kênh đã xử lý</span>${fbStatus!=='pending'?statusPill(fbStatus,pub):'<span class="chip">Facebook chờ</span>'}${gbpId?(gbpStatus!=='pending'?statusPill(gbpStatus,true):'<span class="chip">Google chờ</span>'):''}</div></div>
+    ${inPending&&fbStatus==='pending'?`<label class="selwrap" title="Chọn để duyệt Facebook hàng loạt"><input type="checkbox" class="selbox" data-sel="${d.id}" ${_sel.has(d.id)?'checked':''} onchange="toggleSel('${d.id}',this.checked)" aria-label="Chọn bài này"></label>`:'<span class="selwrap"></span>'}</div>
+   <div class="fbpost-text ${longCaption?'clamped':''}" id="capview_${d.id}">${esc(d.caption)}</div>
+   ${longCaption?`<div class="caption-more"><button id="capmore_${d.id}" onclick="toggleCaption('${d.id}')" aria-expanded="false">xem thêm</button></div>`:''}
+   <div class="fbmedia ${cls}">${shown.map((u,i)=>(i===4&&more>0)?`<div class="more" data-more="+${more} ảnh"><img src="${u}" loading="lazy" alt=""></div>`:`<img src="${u}" loading="lazy" alt="Ảnh ${i+1}">`).join('')}${(d.videoUrls||[]).map((u,i)=>`<video src="${u}" controls aria-label="Video ${i+1}"></video>`).join('')}</div>
+   ${((d.imageCaptions&&d.imageCaptions.some(c=>c))||(d.videoCaptions&&d.videoCaptions.some(c=>c)))?`<div class="fbcaps">
+    <div class="collapse-head"><label>Chú thích từng ảnh (AI viết)</label><button class="btn-ghost" id="capbtn_${d.id}" onclick="toggleField('caps_${d.id}')" aria-expanded="false">${n} ảnh · Chi tiết ${ic('chevron',14)}</button></div>
+    <div id="fld_caps_${d.id}" class="hide">
+     ${imgs.map((u,i)=>`<div class="fbcap"><img class="capthumb" src="${u}" loading="lazy" alt=""><div><b>Ảnh ${i+1}</b>${esc((d.imageCaptions&&d.imageCaptions[i])||'(không có)')}</div></div>`).join('')}
+     ${(d.videoUrls||[]).map((u,i)=>`<div class="fbcap"><span class="capthumb" style="display:flex;align-items:center;justify-content:center;color:#fff">${ic('film')}</span><div><b>Video ${i+1}</b>${esc((d.videoCaptions&&d.videoCaptions[i])||'(không có)')}</div></div>`).join('')}
+    </div></div>`:''}
+   ${comment?`<div class="fbcomment"><span class="who">Bình luận đầu:</span> ${esc(comment)}</div>`:''}
+   <span class="cardmsg" id="msg_${d.id}" role="status" aria-live="polite" style="padding:0 14px"></span>
+   <div class="approvaldetails" id="fld_approval_${d.id}">
+    <div class="channelbox">
+     <div class="channelhead"><b>Facebook</b>${statusPill(fbStatus,pub)}</div>
+     ${fbStatus==='pending'
+      ? (pub
+       ?`<div class="channelmeta">Mặc định của nhóm: công khai</div><div class="channelactions"><button class="btn-success" onclick="approve('${d.id}',true)">${ic('checkCircle')} Đăng công khai</button><button class="btn-ghost" onclick="approve('${d.id}',false)">Lưu nháp</button></div><div class="channelfoot"><button class="btn-quiet danger" onclick="rejectTarget('${d.id}','facebook')">${ic('trash',15)} Bỏ Facebook</button></div>`
+       :`<div class="channelmeta">Mặc định của nhóm: lưu nháp</div><div class="channelactions"><button class="btn-primary" onclick="approve('${d.id}',false)">${ic('check')} Lưu nháp</button><button class="btn-ghost" onclick="approve('${d.id}',true)">Đăng công khai</button></div><div class="channelfoot"><button class="btn-quiet danger" onclick="rejectTarget('${d.id}','facebook')">${ic('trash',15)} Bỏ Facebook</button></div>`)
+      :(fbStatus==='posted'&&!pub
+       ?`<div class="channelmeta">Đã tạo bản nháp Facebook, chưa công khai.</div><div class="channelactions"><button class="btn-success" onclick="postPublish('${d.id}')">${ic('checkCircle')} Đăng công khai</button><button class="btn-danger" onclick="deleteFacebookPost('${d.id}','draft')">${ic('trash',15)} Xóa nháp FB</button></div>`
+       :(fbStatus==='posted'
+        ?`<div class="channelmeta">Facebook đã công khai.</div><div class="channelfoot"><button class="btn-quiet danger" onclick="deleteFacebookPost('${d.id}','published')">${ic('trash',15)} Xóa Facebook</button></div>`
+        :`<div class="channelmeta">Đã bỏ Facebook.</div>`))}
+    </div>
+    ${gbpId?`<div class="channelbox">
+     <div class="channelhead"><b>Google Business</b>${statusPill(gbpStatus,true)}</div>
+     <div class="channelmeta">ID: ${esc(gbpId)}</div>
+     ${gbpStatus==='pending'
+      ?`<div class="channelactions single"><button class="btn-success" onclick="approveGbp('${d.id}')">${ic('checkCircle')} Đăng Google Business</button></div><div class="channelfoot"><button class="btn-quiet danger" onclick="rejectTarget('${d.id}','gbp')">${ic('trash',15)} Bỏ Google</button></div>`
+      :(gbpStatus==='posted'
+       ?`<div class="channelmeta">Đã đăng Google Business.</div><div class="channelfoot"><button class="btn-quiet danger" onclick="removePostedChannel('${d.id}','gbp')">${ic('trash',15)} Bỏ Google khỏi danh sách</button></div>`
+       :`<div class="channelmeta">Đã bỏ Google Business.</div>`)}
+    </div>`:''}
+   </div>
+   ${inPending&&fbStatus==='pending'?`<div class="schedule-row" style="margin:0 14px 12px;padding:10px 12px;border:1px dashed var(--border);border-radius:var(--r-xs);background:var(--surface-2)">
+    ${d.scheduledAt?`<div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span>${ic('clock',15)} Sẽ tự <b>${d.scheduledPublished!==false?'ĐĂNG CÔNG KHAI':'LƯU NHÁP'}</b> lúc <b>${new Date(d.scheduledAt).toLocaleString('vi-VN')}</b></span>
+      <button class="btn-quiet danger" onclick="unschedule('${d.id}')">Hủy lịch</button></div>`
+    :`<div class="row" style="gap:8px;align-items:flex-end;flex-wrap:wrap">
+      <div class="fieldset" style="margin:0;flex:1;min-width:170px"><label for="sched_${d.id}">${ic('clock',14)} Hẹn giờ đăng (thay vì đăng ngay)</label><input type="datetime-local" id="sched_${d.id}"></div>
+      <div class="fieldset" style="margin:0"><label for="schedmode_${d.id}">Khi tới giờ</label><select id="schedmode_${d.id}"><option value="public">Đăng công khai</option><option value="draft">Lưu nháp Facebook</option></select></div>
+      <button class="btn-ghost" onclick="schedulePost('${d.id}')">Hẹn giờ</button></div>`}
+   </div>`:''}
+   ${linkRow}
+   <div class="compact-actions"><span class="muted">${doneCount}/${totalCount} kênh</span><button class="btn-ghost" onclick="openPostDetail('${d.id}')">${ic('ext',14)} Chi tiết</button></div>
+   ${inPending?`<div class="fbpost-util">
+    <button class="btn-quiet" onclick="toggleEdit('${d.id}')" aria-expanded="false">${ic('pencil',15)} Sửa</button>
+    <button class="btn-quiet" onclick="aiRewrite('${d.id}')" title="AI viết lại nội dung cho hấp dẫn hơn">${ic('sparkles',15)} AI viết lại</button>
+    <button class="btn-quiet" onclick="reloadFooter('${d.id}')" title="Áp chân bài / liên hệ mới nhất từ Nhóm → Trang">${ic('refresh',15)} Tải lại chân bài</button>
+    <button class="btn-quiet danger" onclick="reject('${d.id}')">${ic('trash',15)} Từ chối</button>
+   </div>`:`<div class="fbpost-util">
+    <button class="btn-quiet" onclick="reloadFooterPosted('${d.id}')" title="Áp chân bài mới nhất (chỉ cập nhật bản lưu, không sửa bài trên Facebook)">${ic('refresh',15)} Tải lại chân bài</button>
+    <button class="btn-quiet" onclick="redraft('${d.id}')" title="Tạo bản nháp mới (chân bài mới) để duyệt & đăng lại">${ic('repeat',15)} Đăng nháp lại</button>
+    <button class="btn-quiet danger" onclick="removePostedRecord('${d.id}')">${ic('trash',15)} Xóa khỏi danh sách</button>
+   </div>`}
+   ${inPending?`<div class="fbedit hide" id="edit_${d.id}">
+    <p class="section-title">Sửa nội dung bài</p>
+    <textarea id="cap_${d.id}" aria-label="Nội dung bài">${esc(d.caption)}</textarea>
+    <p class="section-title" style="margin-top:12px">Ảnh <span class="muted" style="font-weight:400">— dùng ↑↓ để sắp xếp (trên xuống = đăng lần lượt), ✕ để bỏ, hoặc thêm ảnh mới</span></p>
+    <div class="imgs" id="editimgs_${d.id}">${imgs.map((u,i)=>editImgItem(d.id,u,'orig',i,(d.imageCaptions&&d.imageCaptions[i])||'')).join('')}</div>
+    <label class="btn-ghost" style="margin-top:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><input type="file" accept="image/*" multiple hidden onchange="addEditImgs('${d.id}',this)">${ic('image',15)} Thêm ảnh</label>
+    <div class="row" style="margin-top:10px"><button class="btn-primary" onclick="saveD('${d.id}',${imgs.length})">Lưu sửa</button><button class="btn-ghost" onclick="aiRewrite('${d.id}')" title="AI viết lại nội dung cho hấp dẫn hơn">${ic('sparkles',15)} AI viết lại</button><button class="btn-ghost" onclick="toggleEdit('${d.id}')">Đóng</button><span class="muted" id="airw_${d.id}" role="status" aria-live="polite"></span></div>
+   </div>`:''}
+  </div>`;
+ }).join('')+'</div></div>';
+}
+function toggleEdit(id){const e=$('#edit_'+id);if(e)e.classList.toggle('hide')}
+async function reloadFooter(id){try{await api('/api/pending/'+id+'/reload-footer','POST');toast('Đã tải lại chân bài mới nhất');render()}catch(e){toast('Lỗi: '+e.message)}}
+async function reloadFooterPosted(id){try{await api('/api/posted/'+id+'/reload-footer','POST');toast('Đã cập nhật chân bài (bản lưu)');render()}catch(e){toast('Lỗi: '+e.message)}}
+async function schedulePost(id){const inp=$('#sched_'+id);if(!inp||!inp.value)return toast('Chọn ngày giờ trước');
+ const at=new Date(inp.value).getTime();if(!at||at<Date.now())return toast('Thời gian phải ở tương lai');
+ const mode=($('#schedmode_'+id)&&$('#schedmode_'+id).value)||'public';
+ try{await api('/api/pending/'+id+'/schedule','POST',{at,published:mode==='public'});toast(mode==='public'?'Đã hẹn ĐĂNG CÔNG KHAI':'Đã hẹn LƯU NHÁP');render()}catch(e){toast('Lỗi: '+e.message)}}
+async function unschedule(id){try{await api('/api/pending/'+id+'/unschedule','POST');toast('Đã hủy lịch');render()}catch(e){toast('Lỗi: '+e.message)}}
+async function redraft(id){if(!await confirmModal('Đăng nháp lại?','Tạo một bản nháp MỚI từ bài này (chân bài mới nhất) để bạn duyệt & đăng lại. Bài đã đăng cũ vẫn giữ nguyên.','Tạo nháp','btn-primary'))return;
+ try{await api('/api/posted/'+id+'/redraft','POST');toast('Đã tạo bản nháp mới — vào Cần xử lý để duyệt');_postFilter='needs';localStorage.setItem('postFilter','needs');render()}catch(e){toast('Lỗi: '+e.message)}}
+async function aiRewrite(id){const e=$('#edit_'+id);if(e){e.classList.remove('hide');e.scrollIntoView({behavior:'smooth',block:'nearest'})}
+ const ta=$('#cap_'+id);const m=$('#airw_'+id);if(!ta)return;
+ if(m)m.innerHTML='<span class="spin"></span> AI đang viết lại…';else toast('AI đang viết lại…');
+ try{const r=await api('/api/pending/'+id+'/rewrite','POST',{caption:ta.value});ta.value=r.caption;if(m)m.textContent='✓ Đã viết lại — xem lại rồi bấm Lưu sửa';toast('AI đã viết lại — xem trong khu Sửa, ưng thì Lưu sửa');}
+ catch(e){if(m)m.textContent='';toast('Lỗi: '+e.message)}}
+function setPostFilter(f){_postFilter=f;localStorage.setItem('postFilter',f);_sel.clear();renderDrafts()}
+function setPageFilter(v){_pageFilter=v;localStorage.setItem('folderFilter',v);_sel.clear();renderDrafts()}
+function toggleCaption(id){const text=$('#capview_'+id),btn=$('#capmore_'+id);if(!text||!btn)return;
+ const expanded=!text.classList.toggle('clamped');
+ btn.textContent=expanded?'thu gọn':'xem thêm';
+ btn.setAttribute('aria-expanded',String(expanded));
+}
+function openPostDetail(id){
+ closePostDetail();
+ const card=document.querySelector(`[data-card="${id}"]`);if(!card)return;
+ const closeBtn=document.createElement('button');closeBtn.className='post-modal-close';closeBtn.type='button';closeBtn.setAttribute('aria-label','Đóng chi tiết');closeBtn.innerHTML=ic('x',18);closeBtn.onclick=closePostDetail;
+ card.prepend(closeBtn);
+ const back=document.createElement('div');back.className='post-detail-backdrop';back.id='postDetailBackdrop';back.onclick=closePostDetail;document.body.appendChild(back);
+ card.classList.add('post-expanded');document.body.classList.add('modal-lock');card.scrollTop=0;
+}
+function closePostDetail(){
+ document.querySelectorAll('.fbpost.post-expanded').forEach(open=>{open.classList.remove('post-expanded');const btn=open.querySelector('.post-modal-close');if(btn)btn.remove()});
+ document.querySelectorAll('.post-detail-backdrop').forEach(b=>b.remove());
+ document.body.classList.remove('modal-lock');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePostDetail()});
+
+// ===== Lắng nghe (live) =====
+let _livePoll;
+async function renderLive(){clearInterval(_livePoll);const d=await api('/api/live');paintLive(d);
+ _livePoll=setInterval(async()=>{if(cur!=='live'){clearInterval(_livePoll);return}try{paintLive(await api('/api/live'))}catch(e){}},1000);}
+async function closeSession(tid){if(!await confirmModal('Chốt phiên ngay?','Gom hết ảnh đã nhận và tạo bài để chờ duyệt, không đợi thêm.','Chốt phiên','btn-primary'))return;
+ try{await api('/api/live/close','POST',{threadId:tid});toast('Đang chốt phiên & tạo bài…')}catch(e){toast('Lỗi: '+e.message)}}
+function paintLive(d){const el=$('#live');
+ if(!d.connected){el.innerHTML=`<div class="card"><div class="empty">${svg(ICON.live).replace('18','40')}<div>Zalo chưa kết nối nên chưa lắng nghe được.<br>Bấm <b>Kết nối lại</b>, hoặc vào <b>Cài đặt</b> để quét QR / đổi tài khoản.</div><div class="row" style="justify-content:center;margin-top:14px"><button class="btn-primary" onclick="zaloReconnect()">${ic('refresh')} Kết nối lại</button><button class="btn-ghost" onclick="tab('settings')">Mở Cài đặt</button></div></div></div>`;return}
+ const ts=d.threads||[];const now=d.serverNow||Date.now();
+ if(!ts.length){el.innerHTML=`<div class="card"><div class="empty">${svg(ICON.live).replace('18','40')}<div>Chưa có nhóm nào được đăng ký.<br>Vào <b>Nhóm → Trang</b> thêm nhóm để bắt đầu lắng nghe.</div></div></div>`;return}
+ el.innerHTML=ts.map(t=>liveCard(t,now)).join('');
+}
+function liveCard(t,now){const head=`<div class="live-head"><b>${esc(t.label)}</b>`;
+ if(t.phase==='processing'){const p=t.proc||{};
+  return `<div class="card">${head}<span class="pill on">Đang xử lý</span></div>
+   <div class="stage"><span class="spin"></span> ${esc(p.stage||'Đang xử lý')}…</div>
+   ${(p.kept!=null||p.dropped!=null)?`<p class="muted">Giữ <b>${p.kept??'?'}</b> ảnh${p.videos?(' · '+p.videos+' video'):''}${p.dropped?(' · bỏ '+p.dropped+' ảnh trùng/xấu'):''}</p>`:''}
+   ${p.caption?`<p class="section-title">Nội dung dự kiến</p><div class="fbcomment">${esc(p.caption)}</div>`:''}</div>`;}
+ if(t.phase==='done'){const p=t.proc||{};
+  return `<div class="card">${head}<span class="pill on">Đã tạo bản nháp</span></div>
+   ${p.kept!=null?`<p class="muted">Đã chuẩn bị <b>${p.kept}</b> ảnh${p.videos?(' · '+p.videos+' video'):''}${p.dropped?(' · bỏ '+p.dropped):''}.</p>`:''}
+   <div class="row" style="margin-top:6px"><button class="btn-primary" onclick="tab('drafts')">Xem trong Bài viết →</button></div></div>`;}
+ if(t.phase==='listening'){
+ const closeAt=Math.min((t.lastEventAt||0)+(t.debounceMs||0),(t.mediaStartedAt||t.startedAt||0)+(t.maxWaitMs||0));
+  const remain=Math.max(0,Math.round((closeAt-now)/1000));
+  const due=remain<=0;
+  return `<div class="card">${head}<span class="pill on">Đang gom</span></div>
+   <div class="row" style="justify-content:space-between;align-items:baseline"><span class="muted">Gom được <b>${t.counts.image}</b> ảnh${t.counts.video?(' · '+t.counts.video+' video'):''}${t.counts.text?(' · '+t.counts.text+' ghi chú'):''}</span><span class="countdown">${due?'Đang chốt…':(remain+'s')}</span></div>
+   <p class="field-help" style="margin:2px 0 10px">${due?'<span class="spin"></span> Đã hết giờ, service đang chốt phiên và tạo bản nháp.':('Còn <b>'+remain+'s</b> im lặng nữa là tự chốt.')}</p>
+   <button class="btn-primary" onclick="closeSession('${esc(t.threadId)}')">Chốt phiên ngay</button>
+   <div class="live-feed" style="margin-top:10px">${(t.events||[]).slice(0,6).map(e=>`<div class="ev"><time>${new Date(e.t).toLocaleTimeString('vi-VN')}</time><span>${esc(e.who)}${e.text?(' — '+esc(e.text)):''}</span></div>`).join('')||'<p class="muted">…</p>'}</div></div>`;}
+ if(t.phase==='prelisten'){
+  return `<div class="card">${head}<span class="chip">Đang ghi nhận</span></div>
+   <p class="muted" style="margin:0 0 8px">Đang đọc & ghi nhớ nội dung chat làm <b>tư liệu</b> cho caption. <b>Chưa mở phiên đăng</b> — sẽ bắt đầu gom khi có ảnh/video. (Nếu 1 giờ không có ảnh sẽ tự bỏ.)</p>
+   <div class="live-feed">${(t.events||[]).slice(0,6).map(e=>`<div class="ev"><time>${new Date(e.t).toLocaleTimeString('vi-VN')}</time><span>${esc(e.who)}${e.text?(' — '+esc(e.text)):''}</span></div>`).join('')||'<p class="muted">…</p>'}</div></div>`;}
+ // idle
+ return `<div class="card">${head}<span class="chip">Đang chờ</span></div>
+  <p class="muted" style="margin:0">Chờ ảnh/video. Có ảnh sẽ tự gom, chốt sau <b>${Math.round((t.debounceMs||0)/60000)||'~'}′</b> im lặng.</p></div>`;
+}
+function capsOf(id,n){const a=[];for(let i=0;i<n;i++){const e=$('#ic_'+id+'_'+i);a.push(e?e.value:'')}return a}
+// Bỏ ảnh lẻ trước khi đăng
+window._newImgData=window._newImgData||{};let _nid=0;
+function editImgItem(id,url,kind,ref,caption){return `<div class="imgItem edit-img" ${kind==='orig'?`data-orig="${ref}"`:`data-newid="${esc(ref)}"`}>
+ <img src="${url}" loading="lazy" alt="">
+ <div style="position:absolute;top:5px;left:5px;display:flex;gap:4px">
+  <button type="button" class="imgrm" style="position:static;width:26px;height:26px" title="Lên trước" onclick="moveEditImg(this,-1)">↑</button>
+  <button type="button" class="imgrm" style="position:static;width:26px;height:26px" title="Xuống sau" onclick="moveEditImg(this,1)">↓</button></div>
+ <button type="button" class="imgrm" title="Bỏ ảnh" onclick="this.closest('.edit-img').remove()">${ic('x',15)}</button>
+ <input class="edit-img-cap" aria-label="Chú thích ảnh" placeholder="Chú thích ảnh" value="${esc(caption)}"></div>`}
+function moveEditImg(btn,dir){const it=btn.closest('.edit-img');if(!it)return;const box=it.parentElement;
+ if(dir<0&&it.previousElementSibling)box.insertBefore(it,it.previousElementSibling);
+ else if(dir>0&&it.nextElementSibling)box.insertBefore(it.nextElementSibling,it)}
+async function addEditImgs(id,input){const files=[...(input.files||[])];input.value='';const box=$('#editimgs_'+id);if(!box)return;
+ let added=0;for(const f of files){if(!f.type||!f.type.startsWith('image/'))continue;
+  const dataUrl=await new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(f)});
+  const nid='n'+(++_nid);window._newImgData[nid]=dataUrl;box.insertAdjacentHTML('beforeend',editImgItem(id,dataUrl,'new',nid,''));added++}
+ if(added)toast(added+' ảnh đã thêm — bấm Lưu sửa để áp dụng')}
+function editItems(id){const box=$('#editimgs_'+id);if(!box)return null;
+ return [...box.querySelectorAll('.edit-img')].map(el=>{const caption=(el.querySelector('.edit-img-cap')||{}).value||'';
+  if(el.dataset.orig!=null)return {origIndex:Number(el.dataset.orig),caption};return {newImage:window._newImgData[el.dataset.newid]||'',caption}}).filter(x=>x.origIndex!=null||x.newImage)}
+function saveBody(id){const capEl=$('#cap_'+id);const items=editItems(id);const b={};if(capEl)b.caption=capEl.value;if(items)b.items=items;return b}
+const _rm={};
+function rmOf(id){return [...(_rm[id]||[])]}
+function toggleRm(id,i){_rm[id]=_rm[id]||new Set();const it=$('#im_'+id+'_'+i);
+ if(_rm[id].has(i)){_rm[id].delete(i);if(it)it.classList.remove('removed')}
+ else{const total=document.querySelectorAll('[id^="im_'+id+'_"]').length;
+  if(_rm[id].size>=total-1){toast('Phải giữ ít nhất 1 ảnh');return}
+  _rm[id].add(i);if(it)it.classList.add('removed')}}
+const _inflight=new Set();
+function setCardBusy(id,on){document.querySelectorAll('#cap_'+id+',[id^="ic_'+id+'_"]').forEach(el=>el.disabled=on);
+ document.querySelectorAll('[data-card="'+id+'"] button').forEach(b=>b.disabled=on)}
+function cardMsg(id,html,kind){const e=$('#msg_'+id);if(!e)return;e.className='cardmsg'+(kind?' '+kind:'');e.innerHTML=html}
+async function saveD(id,n){if(_inflight.has(id))return;_inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang lưu…','busy');
+ try{await api('/api/pending/'+id+'/save','POST',saveBody(id));delete _rm[id];toast('Đã lưu chỉnh sửa');render()}
+ catch(e){cardMsg(id,ic('alert')+' Lưu lỗi: '+esc(e.message),'err')}finally{_inflight.delete(id);setCardBusy(id,false)}}
+async function doApprove(id,pub){if(_inflight.has(id))return false;const n=document.querySelectorAll('[id^="ic_'+id+'_"]').length;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>'+(pub?'Đang đăng công khai…':'Đang tạo bản nháp…')+' (giữ ảnh lên Facebook, chờ chút)','busy');
+ try{await api('/api/pending/'+id+'/save','POST',saveBody(id));delete _rm[id];
+  await api('/api/pending/'+id+'/approve','POST',{published:pub});return true}
+ catch(e){cardMsg(id,ic('alert')+' Đăng lỗi: '+esc(e.message)+' — sửa lại rồi thử lại.','err');setCardBusy(id,false);return false}finally{_inflight.delete(id)}}
+async function doApproveGbp(id){if(_inflight.has(id))return false;const n=document.querySelectorAll('[id^="ic_'+id+'_"]').length;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang đăng Google Business bằng Playwright…','busy');
+ try{await api('/api/pending/'+id+'/save','POST',saveBody(id));delete _rm[id];
+  await api('/api/pending/'+id+'/approve/gbp','POST');return true}
+ catch(e){cardMsg(id,ic('alert')+' Google Business lỗi: '+esc(e.message)+' — kiểm tra session/location ID rồi thử lại.','err');setCardBusy(id,false);return false}finally{_inflight.delete(id)}}
+async function approve(id,pub){if(_inflight.has(id))return;
+ const lblEl=document.querySelector('[data-card="'+id+'"] .fbpost-head b')||document.querySelector('[data-card="'+id+'"] b');const dest=lblEl?esc(lblEl.textContent.trim()):'Trang Facebook';
+ const ok=pub
+  ? await confirmModal('Đăng CÔNG KHAI?','Bài sẽ hiện <b>công khai</b> trên Trang:\n<b>'+dest+'</b>\nMọi người đều xem được — hãy chắc các ảnh đều phù hợp.','Đăng công khai','btn-success')
+  : await confirmModal('Lưu bản nháp?','Bài lưu dạng <b>nháp</b> trên Trang <b>'+dest+'</b> — chưa ai thấy, bạn có thể đăng công khai sau.','Lưu nháp','btn-primary');
+ if(!ok)return;
+ if(await doApprove(id,pub)){toast('Đã đăng thành công — xem link ở tab "Đã duyệt"');render();status()}}
+async function approveGbp(id){if(_inflight.has(id))return;
+ if(!await confirmModal('Đăng Google Business?','Bài sẽ được đăng lên Google Business Profile bằng phiên Playwright đã lưu. Hãy chắc nội dung và ảnh phù hợp.','Đăng Google Business','btn-success'))return;
+ if(await doApproveGbp(id)){toast('Đã xử lý Google Business');render();status()}}
+let _sel=new Set();
+function toggleSel(id,on){if(on)_sel.add(id);else _sel.delete(id);updateSelBar()}
+function selAll(on){document.querySelectorAll('.selbox').forEach(c=>{c.checked=on;const id=c.getAttribute('data-sel');if(on)_sel.add(id);else _sel.delete(id)});updateSelBar()}
+function updateSelBar(){const bar=$('#selbar');if(!bar)return;const on=_sel.size>0;bar.classList.toggle('show',on);const c=$('#selcount');if(c)c.textContent=_sel.size;
+ document.documentElement.style.setProperty('--selbar-h',on?(bar.offsetHeight+'px'):'0px')}
+async function bulkApprove(pub){const ids=[..._sel].filter(id=>!_inflight.has(id));if(!ids.length)return;
+ if(!await confirmModal((pub?'Đăng CÔNG KHAI ':'Lưu nháp ')+ids.length+' bài?',(pub?'Tất cả sẽ hiện <b>công khai</b> trên Facebook. ':'')+'Hệ thống làm lần lượt từng bài.',pub?'Đăng công khai':'Lưu nháp',pub?'btn-success':'btn-primary'))return;
+ let ok=0;for(const id of ids){if(await doApprove(id,pub))ok++}
+ _sel.clear();toast('Đã xử lý '+ok+'/'+ids.length+' bài');render();status()}
+async function bulkReject(){const ids=[..._sel];if(!ids.length)return;
+ if(!await confirmModal('Từ chối '+ids.length+' bài?','Các bài sẽ bị bỏ và xoá ảnh. Không khôi phục được.','Từ chối & xoá','btn-danger'))return;
+ let ok=0;for(const id of ids){try{await api('/api/pending/'+id+'/reject','POST');ok++}catch(e){}}
+ _sel.clear();toast('Đã bỏ '+ok+'/'+ids.length+' bài');render();status()}
+async function reject(id){if(_inflight.has(id))return;if(!await confirmModal('Từ chối bài này?','Bài sẽ bị bỏ và ảnh đã xử lý sẽ bị xoá. Không khôi phục được.','Từ chối & xoá','btn-danger'))return;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang bỏ bài…','busy');
+ try{await api('/api/pending/'+id+'/reject','POST');toast('Đã bỏ bài');render();status()}
+ catch(e){cardMsg(id,ic('alert')+' Bỏ bài lỗi: '+esc(e.message),'err');setCardBusy(id,false)}finally{_inflight.delete(id)}}
+async function rejectTarget(id,target){if(_inflight.has(id))return;
+ const name=target==='gbp'?'Google Business':'Facebook';
+ if(!await confirmModal('Bỏ kênh '+name+'?','Chỉ kênh này bị bỏ. Nếu bài còn kênh khác chờ duyệt, nó vẫn nằm trong hàng chờ.','Bỏ kênh','btn-danger'))return;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang bỏ kênh '+esc(name)+'…','busy');
+ try{await api('/api/pending/'+id+'/reject/'+target,'POST');toast('Đã bỏ kênh '+name);render();status()}
+ catch(e){cardMsg(id,ic('alert')+' Bỏ kênh lỗi: '+esc(e.message),'err');setCardBusy(id,false)}finally{_inflight.delete(id)}}
+async function deleteFacebookPost(id,kind){if(_inflight.has(id))return;
+ const isDraft=kind==='draft';
+ const title=isDraft?'Xóa nháp Facebook?':'Xóa bài Facebook?';
+ const body=isDraft?'Bản nháp trên Facebook sẽ bị xóa thật. Google Business nếu đã đăng vẫn được giữ nguyên.':'Bài trên Facebook sẽ bị xóa thật. Google Business nếu đã đăng vẫn được giữ nguyên.';
+ if(!await confirmModal(title,body,isDraft?'Xóa nháp FB':'Xóa Facebook','btn-danger'))return;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang xóa Facebook…','busy');
+ try{await api('/api/posted/'+id+'/delete/facebook','POST');toast('Đã xóa Facebook');render();status()}
+ catch(e){cardMsg(id,ic('alert')+' Xóa Facebook lỗi: '+esc(e.message),'err');setCardBusy(id,false)}
+ finally{_inflight.delete(id)}
+}
+async function removePostedChannel(id,target){if(_inflight.has(id))return;
+ const name=target==='gbp'?'Google Business':'Facebook';
+ if(!await confirmModal('Bỏ '+name+' khỏi danh sách?','Chỉ dọn trạng thái trong dashboard, không xóa bài thật trên nền tảng ngoài.','Bỏ khỏi danh sách','btn-danger'))return;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang cập nhật…','busy');
+ try{await api('/api/posted/'+id+'/remove/'+target,'POST');toast('Đã bỏ '+name+' khỏi danh sách');render();status()}
+ catch(e){cardMsg(id,ic('alert')+' Cập nhật lỗi: '+esc(e.message),'err');setCardBusy(id,false)}
+ finally{_inflight.delete(id)}
+}
+async function removePostedRecord(id){if(_inflight.has(id))return;
+ if(!await confirmModal('Xóa khỏi danh sách?','Chỉ xóa bản ghi khỏi dashboard, không xóa bài đã đăng trên Facebook hoặc Google.','Xóa khỏi danh sách','btn-danger'))return;
+ _inflight.add(id);setCardBusy(id,true);cardMsg(id,'<span class="spin"></span>Đang xóa khỏi danh sách…','busy');
+ try{await api('/api/posted/'+id+'/remove','POST');toast('Đã xóa khỏi danh sách');render();status()}
+ catch(e){cardMsg(id,ic('alert')+' Xóa khỏi danh sách lỗi: '+esc(e.message),'err');setCardBusy(id,false)}
+ finally{_inflight.delete(id)}
+}
+
+function normViet(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/gi,'d').toLowerCase()}
+function groupField(r,i,groups){
+ if(!groups)return `<input id="r_thread_${i}" value="${esc(r.threadId||'')}" oninput="_routes.routes[${i}].threadId=this.value" placeholder="Mã nhóm Zalo (threadId)">`;
+ const cur=groups.find(g=>g.threadId===r.threadId);
+ const display=cur?cur.name:(r.threadId?('Mã: '+r.threadId):'');
+ return `<div class="combo">
+   <input type="text" class="combo-input" id="r_thread_${i}" autocomplete="off" placeholder="Gõ tên nhóm để tìm…" value="${esc(display)}"
+     oninput="comboItems(${i},this.value)" onfocus="comboItems(${i},'')" onblur="comboClose(${i})" onkeydown="comboKey(event,${i})" role="combobox" aria-expanded="false" aria-autocomplete="list">
+   <div class="combo-list hide" id="combo_${i}" role="listbox"></div>
+ </div>`;
+}
+function comboItems(i,q){
+ const groups=window._zgroups||[];const box=$('#combo_'+i);if(!box)return;
+ const nq=normViet(q);
+ const list=(nq?groups.filter(g=>normViet(g.name).includes(nq)||String(g.threadId).includes(q.trim())):groups);
+ box.innerHTML=list.length?list.slice(0,80).map(g=>`<div class="combo-item" role="option" data-tid="${esc(g.threadId)}" data-name="${esc(g.name)}" onmousedown="comboPick(${i},this.dataset.tid,this.dataset.name)"><span>${esc(g.name)}</span><span class="gid">${esc(g.threadId)}</span></div>`).join(''):'<div class="combo-empty">Không thấy nhóm khớp. Bấm nút Tải lại danh sách nếu thiếu.</div>';
+ box.classList.remove('hide');const inp=$('#r_thread_'+i);if(inp)inp.setAttribute('aria-expanded','true');
+}
+function comboPick(i,tid,name){window._routes.routes[i].threadId=tid;
+ const inp=$('#r_thread_'+i);if(inp){inp.value=name;inp.setAttribute('aria-expanded','false')}
+ const box=$('#combo_'+i);if(box)box.classList.add('hide');}
+function comboClose(i){const box=$('#combo_'+i);if(box)setTimeout(()=>box.classList.add('hide'),150)}
+function comboKey(e,i){const box=$('#combo_'+i);if(!box)return;
+ if(box.classList.contains('hide')){if(e.key==='ArrowDown')comboItems(i,($('#r_thread_'+i)||{}).value||'');return}
+ const items=[...box.querySelectorAll('.combo-item')];if(!items.length)return;
+ let hl=items.findIndex(x=>x.classList.contains('hl'));
+ if(e.key==='ArrowDown'){e.preventDefault();hl=Math.min(items.length-1,hl+1)}
+ else if(e.key==='ArrowUp'){e.preventDefault();hl=hl<=0?0:hl-1}
+ else if(e.key==='Enter'){e.preventDefault();const t=items[hl<0?0:hl];if(t)comboPick(i,t.dataset.tid,t.dataset.name);return}
+ else if(e.key==='Escape'){box.classList.add('hide');return}
+ else return;
+ items.forEach(x=>x.classList.remove('hl'));if(items[hl]){items[hl].classList.add('hl');items[hl].scrollIntoView({block:'nearest'})}}
+function pageField(r,i,pages){
+ if(!pages||!pages.length)return `<input id="r_page_${i}" value="${esc(r.fanpageId||'')}" oninput="_routes.routes[${i}].fanpageId=this.value" placeholder="ID Trang Facebook">`;
+ const inList=pages.some(p=>p.fanpageId===r.fanpageId);
+ return `<select id="r_page_${i}" onchange="pickPage(${i},this.value)">
+   <option value="">— Chọn Trang Facebook —</option>
+   ${pages.map(p=>`<option value="${esc(p.fanpageId)}" ${p.fanpageId===r.fanpageId?'selected':''}>${esc(p.name)}${p.hasToken?'':' — chưa có token'}</option>`).join('')}
+   ${(!inList&&r.fanpageId)?`<option value="${esc(r.fanpageId)}" selected>ID: ${esc(r.fanpageId)}</option>`:''}
+ </select>`;
+}
+function pickPage(i,fid){const r=window._routes.routes[i];r.fanpageId=fid;const p=(window._fbpages||[]).find(x=>x.fanpageId===fid);if(p&&p.envName)r.fanpageTokenEnv=p.envName;}
+function gbpIdsR(r){return (Array.isArray(r.gbpLocationIds)&&r.gbpLocationIds.length)?r.gbpLocationIds.map(String):(r.gbpLocationId?[String(r.gbpLocationId)]:[])}
+function gbpField(r,i,items){
+ const sel=gbpIdsR(r);
+ if(items===undefined)return `<p class="field-help"><span class="spin"></span> Đang tải danh sách Google Business…</p>`;
+ if(!items||!items.length)return `<input id="r_gbp_${i}" value="${esc(sel.join(', '))}" oninput="setGbpIds(${i},this.value)" placeholder="Nhập ID (nhiều business ngăn bằng dấu phẩy)"><p class="field-help">Chưa lưu hồ sơ nào. Vào tab <b>Google Business</b> để thêm, hoặc nhập ID tay (phẩy ngăn cách).</p>`;
+ return `<div class="gbp-multi" style="display:flex;flex-direction:column;gap:6px;border:1px solid var(--border);border-radius:var(--r-xs);padding:8px;max-height:160px;overflow:auto">
+  ${items.map(x=>`<label class="sw" style="gap:8px"><input type="checkbox" value="${esc(x.id)}" ${sel.includes(String(x.id))?'checked':''} onchange="toggleGbpId(${i},'${esc(x.id)}',this.checked)"> ${esc(x.name||('Business '+x.id))}</label>`).join('')}
+  ${sel.filter(id=>!items.some(x=>String(x.id)===id)).map(id=>`<label class="sw" style="gap:8px"><input type="checkbox" checked onchange="toggleGbpId(${i},'${esc(id)}',this.checked)"> ID: ${esc(id)} (chưa lưu hồ sơ)</label>`).join('')}
+ </div><p class="field-help">Tích các business muốn đăng (có thể chọn NHIỀU). Bỏ tích hết = không đăng GBP.</p>`;
+}
+function toggleGbpId(i,id,on){const r=window._routes.routes[i];let a=gbpIdsR(r).slice();id=String(id);if(on){if(!a.includes(id))a.push(id)}else{a=a.filter(x=>x!==id)}r.gbpLocationIds=a;r.gbpLocationId=a[0]||'';if(!a.length)r.gbpAutoPublish=false;setRouteBadge(i)}
+function setGbpIds(i,str){const a=str.split(',').map(s=>s.trim()).filter(Boolean);const r=window._routes.routes[i];r.gbpLocationIds=a;r.gbpLocationId=a[0]||'';if(!a.length)r.gbpAutoPublish=false;setRouteBadge(i)}
+async function ensureFbPages(){if(window._fbpages===undefined){try{window._fbpages=await api('/api/fb/pages')}catch(e){window._fbpages=null}}}
+async function ensureGbpBusinesses(){if(window._gbps===undefined){try{window._gbps=await api('/api/gbp/businesses')}catch(e){window._gbps=null}}}
+async function ensureGroups(){if(window._zgroups===undefined){try{window._zgroups=await api('/api/zalo/groups')}catch(e){window._zgroups=null}}}
+function loadLists(){ // tải nhóm + Trang ở nền, vẽ lại khi xong (không chặn UI)
+ if(window._zgroups!==undefined&&window._fbpages!==undefined&&window._gbps!==undefined)return;
+ Promise.all([ensureGroups(),ensureFbPages(),ensureGbpBusinesses()]).then(()=>{if(cur==='routes')paintRoutes()});
+}
+function reloadGroups(){window._zgroups=undefined;window._fbpages=undefined;window._gbps=undefined;toast('Đang tải lại danh sách…');paintRoutes();loadLists()}
+async function saveGroupAllow(){const v=($('#groupAllow').value||'').split(/[\s,]+/).map(x=>x.trim()).filter(Boolean);
+ try{await api('/api/settings','POST',{groupAllowlist:v});toast(v.length?('Chỉ hiện '+v.length+' nhóm'):'Hiện tất cả nhóm');window._zgroups=undefined;try{window._st=await api('/api/status')}catch(e){}render()}catch(e){toast('Lỗi: '+e.message)}}
+function showAllGroups(){const box=$('#allGroupsRef');if(!box)return;
+ box.innerHTML=`<div class="row" style="gap:8px;align-items:flex-end"><div class="fieldset" style="margin:0;flex:1;min-width:160px"><label for="grpUnlock">Nhập mật khẩu để xem tất cả nhóm (kể cả nhóm riêng)</label><input type="password" id="grpUnlock" autocomplete="off" onkeydown="if(event.key==='Enter')unlockAllGroups()"></div><button class="btn-primary" onclick="unlockAllGroups()">${ic('checkCircle',15)} Mở khóa</button></div>`;
+ const i=$('#grpUnlock');if(i)i.focus();}
+async function unlockAllGroups(){const pass=($('#grpUnlock')&&$('#grpUnlock').value)||'';const box=$('#allGroupsRef');if(!box)return;
+ box.innerHTML='<span class="spin"></span> đang tải…';
+ try{const g=await api('/api/zalo/groups/reveal','POST',{pass});window._allGroups=g;
+  box.innerHTML=`<input id="grpSearch" placeholder="Tìm nhóm theo tên hoặc mã…" oninput="filterAllGroups()" style="margin-bottom:8px"><div class="muted" style="font-size:var(--fs-xs);margin-bottom:6px">${g.length} nhóm · bấm 1 nhóm để thêm vào lọc</div><div id="grpList"></div>`;filterAllGroups();const s=$('#grpSearch');if(s)s.focus();
+ }catch(e){box.innerHTML=`<p class="cardmsg err" style="display:block">${esc(e.message)}</p><button class="btn-ghost" onclick="showAllGroups()" style="margin-top:8px">Thử lại</button>`}}
+function filterAllGroups(){const q=(($('#grpSearch')&&$('#grpSearch').value)||'').toLowerCase().trim();const list=$('#grpList');if(!list)return;
+ const items=(window._allGroups||[]).filter(x=>!q||(String(x.name||'').toLowerCase().includes(q)||String(x.threadId).includes(q))).slice(0,400);
+ list.innerHTML=items.length?items.map(x=>`<div class="logline" style="cursor:pointer" onclick="addAllowId('${esc(x.threadId)}')" title="Bấm để thêm vào lọc"><code>${esc(x.threadId)}</code> · ${esc(x.name)}</div>`).join(''):'<p class="muted">Không thấy nhóm khớp.</p>';}
+function addAllowId(id){const ta=$('#groupAllow');if(!ta)return;const cur=ta.value.split(/[\s,]+/).map(x=>x.trim()).filter(Boolean);if(!cur.includes(id))cur.push(id);ta.value=cur.join('\n');toast('Đã thêm '+id+' — nhớ bấm Lưu lọc')}
+async function renderRoutes(){const data=await api('/api/routes');window._routes=data;try{window._st=await api('/api/status')}catch(e){}paintRoutes();loadLists()}
+function paintRoutes(){const data=window._routes||{routes:[]};const list=Array.isArray(data.routes)?data.routes:[];const groups=window._zgroups;
+ // Ghi rõ thời gian thật (nếu route chưa đặt thì lấy mặc định) -> ô hiển thị = giá trị sẽ lưu, không lệch nhau
+ const defs=data.defaults||{};list.forEach(r=>{if(r.debounceMs==null)r.debounceMs=defs.debounceMs??600000;if(r.maxWaitMs==null)r.maxWaitMs=defs.maxWaitMs??1800000;});
+ const loading=(window._zgroups===undefined||window._fbpages===undefined);
+ const el=$('#routes');
+ const _folders=[...new Set(list.map(r=>(r.folder||'').trim()).filter(Boolean))];
+ const head=`<datalist id="folderlist">${_folders.map(f=>`<option value="${esc(f)}">`).join('')}</datalist><div class="card"><div class="card-head"><b>Nhóm Zalo → Kênh đăng</b><button class="btn-ghost" onclick="reloadGroups()">${ic('refresh')} Tải lại danh sách</button></div>
+   <p class="muted" style="margin:0">Mỗi dòng chọn một <b>nhóm Zalo</b> nguồn, rồi chọn nơi đăng tương ứng: <b>Trang Facebook</b> và/hoặc <b>Google Business</b>. Sửa xong nhớ bấm <b>Lưu cấu hình</b>.</p>
+   ${loading?'<p class="field-help" style="margin-top:8px"><span class="spin"></span> Đang tải danh sách nhóm & Trang… (có thể nhập tay trong lúc chờ)</p>':''}</div>`;
+ if(!list.length){el.innerHTML=head+`<div class="card"><div class="guide"><h3>Chưa có nhóm nào được nối</h3>
+   <ol class="steps">
+    <li><b>Thêm nhóm</b> bằng nút bên dưới.</li>
+    <li><b>Chọn nhóm Zalo</b> nguồn, <b>Trang Facebook</b> và <b>Google Business</b> đích từ danh sách (không cần gõ ID).</li>
+    <li>Sang tab <b>Token</b> cấp token cho Trang, rồi quay lại bật <b>Đăng công khai</b> nếu muốn đăng thẳng.</li>
+   </ol>
+   <div class="row" style="margin-top:6px"><button class="btn-primary" onclick="addRoute()">+ Thêm nhóm</button></div></div></div>`;return}
+ el.innerHTML=head+list.map((r,i)=>`<div class="card route-card" style="background:var(--surface-2)" role="group" aria-label="Cấu hình nhóm ${i+1}">
+   <div class="route-head" onclick="toggleField('route_${i}')">
+    <b class="route-title" id="rt_${i}">${esc(r.label||('Nhóm '+(i+1)))}</b>
+    <span class="route-badges"><span class="pill ${r.enabled!==false?'on':'off'}" id="bp_${i}">${r.enabled!==false?'Bật':'Tắt'}</span><span class="chip${r.facebookAutoPublish?' warn':''}" id="fp_${i}">${r.facebookAutoPublish?'FB tự đăng':'FB chờ duyệt'}</span>${gbpIdsR(r).length?`<span class="chip${r.gbpAutoPublish?' warn':''}" id="gp_${i}">${r.gbpAutoPublish?'GBP tự đăng':'GBP chờ duyệt'} (${gbpIdsR(r).length})</span>`:''}<span class="chev${(r.threadId&&r.fanpageId)?'':' open'}" id="arrow_route_${i}">${ic('chevron',16)}</span></span>
+   </div>
+   <div id="fld_route_${i}" class="route-body${(r.threadId&&r.fanpageId)?' hide':''}">
+    <div class="route-map-grid two">
+     <div class="fieldset"><label for="r_label_${i}">Tên gợi nhớ</label><input id="r_label_${i}" value="${esc(r.label||'')}" oninput="_routes.routes[${i}].label=this.value;const t=$('#rt_${i}');if(t)t.textContent=this.value||'Nhóm ${i+1}'" placeholder="VD: Lớp Mầm → Page Việt Anh"></div>
+     <div class="fieldset"><label for="r_folder_${i}">Mục / Người phụ trách</label><input id="r_folder_${i}" value="${esc(r.folder||'')}" oninput="_routes.routes[${i}].folder=this.value" placeholder="VD: Chị Lan · Thương hiệu A" list="folderlist"><p class="field-help">Gom các Trang cùng người phụ trách vào 1 mục — màn <b>Bài viết</b> lọc theo mục này để không lộn thẻ của nhau.</p></div>
+    </div>
+    <div class="route-map-grid">
+     <div class="fieldset"><label for="r_thread_${i}">Nhóm Zalo (nguồn ảnh)</label>${groupField(r,i,groups)}<p class="field-help">Nhóm thành viên gửi ảnh vào.</p></div>
+     <div class="fieldset"><label for="r_page_${i}">Trang Facebook (đăng tới)</label>${pageField(r,i,window._fbpages)}<p class="field-help">Chưa thấy Trang? Vào tab <b>Token</b> dán user token để hệ thống tự tìm.</p></div>
+     <div class="fieldset"><label for="r_gbp_${i}">Google Business</label>${gbpField(r,i,window._gbps)}<p class="field-help">Chọn hồ sơ đã lưu ở tab <b>Google Business</b>, hoặc để trống.</p></div>
+    </div>
+    <div class="swrow">
+     <label class="sw rsw"><input type="checkbox" ${r.enabled!==false?'checked':''} onchange="_routes.routes[${i}].enabled=this.checked;setRouteBadge(${i})"> Bật nhóm này</label>
+     <label class="sw rsw" title="Bật: AI bỏ ảnh trùng/mờ/tối và chọn ảnh đẹp trong cụm. Tắt: giữ NGUYÊN mọi ảnh gửi vào."><input type="checkbox" ${r.curateImages!==false?'checked':''} onchange="_routes.routes[${i}].curateImages=this.checked"> Lọc ảnh (bỏ trùng/mờ/tối)</label>
+     <label class="sw rsw rsw-warn"><input type="checkbox" ${r.facebookAutoPublish?'checked':''} onchange="_routes.routes[${i}].facebookAutoPublish=this.checked;_routes.routes[${i}].published=this.checked;setRouteBadge(${i})"> Facebook tự đăng công khai</label>
+     <label class="sw rsw rsw-warn"><input type="checkbox" ${r.gbpAutoPublish?'checked':''} onchange="_routes.routes[${i}].gbpAutoPublish=this.checked;setRouteBadge(${i})" ${gbpIdsR(r).length?'':'disabled'}> Google Business tự đăng</label>
+    </div>
+   <div class="collapse-head" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px" onclick="toggleField('adv_${i}')"><label>Cài đặt nâng cao</label><span class="collapse-state">thời gian · bình luận · chân bài · hướng dẫn viết · hashtag <span class="chev" id="arrow_adv_${i}">${ic('chevron',14)}</span></span></div>
+   <div id="fld_adv_${i}" class="hide">
+    <div class="row" style="margin-top:8px">
+     <div class="fieldset"><label for="r_deb_${i}">Chốt sau im lặng (phút)</label><input id="r_deb_${i}" type="number" min="0.1" step="0.5" value="${(r.debounceMs/60000)}" oninput="_routes.routes[${i}].debounceMs=Math.max(5000,Math.round(this.value*60000))"></div>
+     <div class="fieldset"><label for="r_max_${i}">Tối đa mỗi phiên (phút)</label><input id="r_max_${i}" type="number" min="1" step="1" value="${(r.maxWaitMs/60000)}" oninput="_routes.routes[${i}].maxWaitMs=Math.max(30000,Math.round(this.value*60000))"></div>
+    </div>
+    <div class="fieldset" style="margin-top:10px"><label for="r_cmt_${i}">Bình luận đầu tự động (tuỳ chọn)</label>
+     <div class="row" style="gap:8px"><input style="flex:1;min-width:140px" id="r_cmt_${i}" value="${esc(r.comment||'')}" oninput="_routes.routes[${i}].comment=this.value" placeholder="VD: ☎ 0902 095 956 · Địa chỉ ...">
+      <button class="btn-danger" onclick="clearComment(${i})">Xoá</button></div>
+     <p class="field-help">Tự bình luận ngay dưới bài vừa đăng.</p></div>
+    <div class="fieldset" style="margin-top:10px"><label for="r_foot_${i}">Chân bài cố định (hotline + địa chỉ) ${r.captionFooter?('· <span class="pill on">'+r.captionFooter.length+' ký tự</span>'):''}</label>
+     <textarea id="r_foot_${i}" rows="5" oninput="_routes.routes[${i}].captionFooter=this.value" placeholder="Dán nguyên khối liên hệ (hotline, địa chỉ, hashtag, Google Maps...).">${esc(r.captionFooter||'')}</textarea>
+     <p class="field-help">Hệ thống tự chèn nguyên văn xuống cuối mỗi bài.</p></div>
+    <div class="fieldset" style="margin-top:10px"><label for="r_style_${i}">Hướng dẫn viết cho Trang (tuỳ chọn) ${(()=>{const g=r.writeGuide??r.styleSample??'';return g?('· <span class="pill on">'+g.length+' ký tự</span>'):''})()}</label>
+     <textarea id="r_style_${i}" rows="6" oninput="_routes.routes[${i}].writeGuide=this.value" placeholder="Viết CHỈ DẪN cho AI (không phải bài mẫu để chép), VD:&#10;- Phong cách: gần gũi, nhiều cảm xúc.&#10;- Xưng hô: gọi 'ba mẹ', xưng 'nhà trường'.&#10;- Chương trình đang chạy: Ưu đãi học phí tháng 7.&#10;- Lead magnet: mời để lại SĐT nhận lịch tham quan.&#10;Để trống = phong cách mặc định.">${esc(r.writeGuide??r.styleSample??'')}</textarea>
+     <p class="field-help">AI DỰA vào hướng dẫn này để tùy biến bài (giọng văn, xưng hô, campaign, lead magnet, chương trình) — không bắt chước máy móc.</p></div>
+    <label class="sw rsw" style="margin-top:10px"><input type="checkbox" ${r.autoHashtags!==false?'checked':''} onchange="_routes.routes[${i}].autoHashtags=this.checked"> AI tự thêm 5 hashtag ở cuối bài (dưới chân bài)</label>
+   </div>
+   <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px"><button class="btn-quiet" style="color:var(--muted);font-size:var(--fs-sm)" onclick="deleteRoute(event,${i})">${ic('trash',14)} Xoá nhóm này</button></div>
+   </div>
+  </div>`).join('')+
+  `<div class="card"><div class="row"><button class="btn-primary" onclick="saveRoutes()">Lưu cấu hình</button><button class="btn-ghost" onclick="addRoute()">+ Thêm nhóm</button>${groups===null?'<span class="field-help">Chưa tải được danh sách nhóm (Zalo chưa kết nối) — tạm nhập mã nhóm tay.</span>':''}</div></div>`;
+}
+async function deleteRoute(e,i){e.stopPropagation();const r=window._routes&&window._routes.routes&&window._routes.routes[i];const name=r&&r.label?`"${r.label}"`:`Nhóm ${i+1}`;if(!await confirmModal(`Xoá ${name}?`,'Nhóm này sẽ bị xoá khỏi cấu hình. Các bài đã đăng không bị ảnh hưởng.','Xoá nhóm','btn-danger'))return;window._routes.routes.splice(i,1);paintRoutes();saveRoutes()}
+function addRoute(){if(!window._routes)window._routes={routes:[]};window._routes.routes.push({threadId:'',label:'',folder:'',fanpageId:'',fanpageTokenEnv:'',published:false,facebookAutoPublish:false,gbpAutoPublish:false,enabled:true,curateImages:true,comment:'',captionFooter:'',writeGuide:'',autoHashtags:true,gbpLocationIds:[],gbpLocationId:'',debounceMs:60000,maxWaitMs:300000});paintRoutes()}
+async function clearComment(i){if(!await confirmModal('Xoá bình luận tự động?','Nhóm này sẽ không tự bình luận dưới bài nữa.','Xoá','btn-danger'))return;window._routes.routes[i].comment='';const e=$('#r_cmt_'+i);if(e)e.value='';saveRoutes()}
+function toggleField(id){const f=$('#fld_'+id);if(!f)return;const collapsed=f.classList.toggle('hide');const a=$('#arrow_'+id);if(a)a.classList.toggle('open',!collapsed);
+ const btn=document.querySelector(`[onclick="toggleField('${id}')"]`);
+ if(btn&&id.startsWith('caps_')){const count=(btn.textContent.match(/^\s*([0-9]+)/)||[])[1]||'';btn.innerHTML=(count?count+' ảnh · ':'')+(collapsed?'Chi tiết ':'Thu gọn ')+ic('chevron',14);btn.setAttribute('aria-expanded',String(!collapsed));}}
+function setRouteBadge(i){const r=window._routes.routes[i];const b=$('#bp_'+i);if(b){b.className='pill '+(r.enabled!==false?'on':'off');b.textContent=r.enabled!==false?'Bật':'Tắt'}
+ const f=$('#fp_'+i);if(f){f.className='chip'+(r.facebookAutoPublish?' warn':'');f.textContent=r.facebookAutoPublish?'FB tự đăng':'FB chờ duyệt'}
+ const g=$('#gp_'+i);if(g){g.className='chip'+(r.gbpAutoPublish?' warn':'');g.textContent=(r.gbpAutoPublish?'GBP tự đăng':'GBP chờ duyệt')+' ('+gbpIdsR(r).length+')'}}
+async function saveRoutes(){const rs=(window._routes&&window._routes.routes)||[];
+ for(let i=0;i<rs.length;i++){const r=rs[i],miss=[];
+  r.facebookAutoPublish=!!r.facebookAutoPublish;
+  r.gbpLocationIds=gbpIdsR(r);r.gbpLocationId=r.gbpLocationIds[0]||'';
+  r.gbpAutoPublish=!!(r.gbpLocationIds.length&&r.gbpAutoPublish);
+  if(r.facebookAutoPublish)r.published=true;
+  if(!r.threadId)miss.push('nhóm Zalo');if(!r.fanpageId)miss.push('Trang Facebook');
+  if(miss.length){toast('Chưa lưu — Nhóm '+(i+1)+' ('+(r.label||'chưa đặt tên')+') thiếu: '+miss.join(', '));return}
+  const pg=(window._fbpages||[]).find(x=>x.fanpageId===r.fanpageId);
+  if(pg&&!pg.hasToken){toast('Trang "'+pg.name+'" chưa có token — vào tab Token cấp trước khi lưu.');return}
+  if(r.debounceMs&&r.maxWaitMs&&r.maxWaitMs<r.debounceMs){toast('Nhóm '+(i+1)+': "Tối đa mỗi phiên" phải ≥ "Chốt sau khi im lặng".');return}}
+ try{await api('/api/routes','POST',window._routes);toast('Đã lưu cấu hình');render()}
+ catch(e){toast('Lỗi: '+e.message)}}
+
+async function renderToken(){const t=await api('/api/token');const el=$('#token');
+ const appOk=!!t.appId&&!!t.hasSecret;
+ const editing=!appOk||window._editFbApp;  // đã cấu hình -> KHÓA (đóng băng), bấm "Đổi" mới sửa
+ const lock=editing?'':'readonly style="background:var(--surface-2);color:var(--muted);cursor:not-allowed"';
+ const appCard=`<div class="card"><div class="card-head"><b>Ứng dụng Facebook</b><span class="pill ${appOk?'on':'off'}">${appOk?(editing?'đang sửa':'đã khóa'):'chưa cấu hình'}</span></div>
+  <p class="muted" style="margin:0 0 10px;font-size:var(--fs-sm)">${editing?'Mở trang ứng dụng → <b>Cài đặt → Cơ bản</b> để lấy App ID + Khoá bí mật.':'Đã cấu hình và khóa. Bấm <b>Đổi</b> nếu cần sửa.'}</p>
+  <div class="row" style="gap:8px;flex-wrap:wrap">
+   <div class="fieldset" style="flex:1;min-width:150px;margin:0"><label for="fbAppId">App ID</label><input id="fbAppId" value="${t.appId?esc(t.appId):''}" placeholder="VD: 1234567890" ${lock}></div>
+   <div class="fieldset" style="flex:1;min-width:150px;margin:0"><label for="fbAppSecret">App Secret</label><input id="fbAppSecret" type="password" autocomplete="off" placeholder="${t.hasSecret?'•••• đã có (để trống = giữ)':'Khoá bí mật'}" ${lock}></div>
+  </div>
+  <div class="row" style="margin-top:10px;gap:8px">${editing
+    ? `<button class="btn-primary" onclick="saveFbApp()">Lưu</button>${appOk?`<button class="btn-ghost" onclick="cancelEditFbApp()">Hủy</button>`:''}<a class="btn-ghost" href="https://developers.facebook.com/apps" target="_blank" rel="noopener">${ic('ext',14)} Mở Facebook Developers</a>`
+    : `<button class="btn-ghost" onclick="editFbApp()">${ic('pencil',14)} Đổi</button><button class="btn-quiet danger" style="margin-left:auto" onclick="clearFbApp()">${ic('trash',14)} Xóa cấu hình</button>`}</div>
+ </div>`;
+ const anyExpiring=t.pages.some(p=>p.hasToken&&p.expiresAt!=null&&p.expiresAt!==0);
+ const anyMissing=t.pages.some(p=>!p.hasToken);
+ el.innerHTML=appCard+`<div class="card"><div class="card-head"><b>Trạng thái token theo Trang</b><span class="muted" style="font-size:var(--fs-xs)">${t.pages.length} Trang</span></div>
+  <div class="table-wrap"><table class="tbl-token"><thead><tr><th>Trang</th><th>ID Trang</th><th>Token</th><th>Hết hạn</th><th></th></tr></thead><tbody>${t.pages.length?t.pages.map(p=>`<tr><td>${esc(p.page)}</td><td class="muted">${esc(p.fanpageId)}</td><td>${p.hasToken?'<span class="pill on">đã có</span>':'<span class="pill off">thiếu</span>'}</td><td>${expiryText(p.expiresAt)}</td><td style="text-align:right"><button class="btn-quiet danger" title="Xóa Trang khỏi danh sách" onclick="deletePageToken('${esc(p.fanpageId)}','${esc((p.page||'').replace(/'/g,'’'))}')">${ic('trash',14)}</button></td></tr>`).join(''):'<tr><td colspan="5" class="muted">Chưa có Trang nào — dán user token bên dưới.</td></tr>'}</tbody></table></div>
+  <p class="field-help" style="margin-top:8px">${anyMissing?ic('alert',14)+' Có Trang chưa có token — cấp ngay bên dưới. ':''}${anyExpiring?ic('alert',14)+' Có token sắp hết hạn — nên cấp lại. ':''}${(!anyMissing&&!anyExpiring&&t.pages.length)?ic('check',14)+' Mọi token đều ổn (vĩnh viễn) — chưa cần làm gì.':''}</p></div>
+  <div class="card"><div class="card-head"><b>Thêm / làm mới token</b></div>
+  <label style="display:block;margin:0 0 4px;font-weight:600;font-size:var(--fs-sm)">1 · User Token Facebook</label>
+  <textarea id="utok" aria-label="Dán User Token Facebook" placeholder="Dán User Token Facebook vào đây…"></textarea>
+  <label style="display:block;margin:12px 0 4px;font-weight:600;font-size:var(--fs-sm)">2 · Các Trang cần đăng (ID hoặc link — mỗi dòng 1)</label>
+  <textarea id="pageids" aria-label="Trang cần đăng" placeholder="VD: facebook.com/TenTrang  hoặc  1234567890" style="min-height:56px"></textarea>
+  <p class="field-help" style="margin:4px 0 0">Liệt kê các Trang bạn <b>quản lý &amp; muốn đăng</b>. Trang trong <b>Business Manager bắt buộc điền</b> ở đây (user token không tự liệt kê được). Lấy ID: Trang → Giới thiệu → ID Trang.</p>
+  <div class="row" style="margin-top:10px"><button class="btn-primary" onclick="refreshTok()">Cấp / làm mới token</button><a class="btn-ghost" href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">Graph Explorer ${ic('ext',14)}</a><span class="muted" id="tokmsg" role="status" aria-live="polite"></span></div>
+  <div class="fieldset" style="margin-top:14px">
+   <div class="collapse-head" onclick="toggleField('tokguide')"><label>Hướng dẫn lấy token — 4 bước</label><span class="collapse-state">bấm để mở <span class="chev" id="arrow_tokguide">${ic('chevron',14)}</span></span></div>
+   <div id="fld_tokguide" class="hide">
+    <ol class="steps" style="margin-top:8px">
+     <li>Mở <b>Graph Explorer</b> (nút bên trên), chọn đúng <b>ứng dụng (App)</b> của bạn ở góc phải.</li>
+     <li>Bấm <b>Permissions</b> → thêm 3 quyền: <b>pages_show_list</b>, <b>pages_manage_posts</b>, <b>pages_read_engagement</b>.</li>
+     <li>Bấm <b>Generate Access Token</b>, đăng nhập nếu được hỏi, rồi <b>copy</b> chuỗi token.</li>
+     <li>Dán vào ô trên → hệ thống tự <b>tìm mọi Trang bạn quản lý</b> và cấp token vĩnh viễn.</li>
+    </ol>
+    <p class="field-help" style="margin:6px 0 0">Mẹo: cũng có thể dán <b>Page Token</b> của riêng một Trang. Nếu báo <i>"không tìm thấy Trang"</i> → token thiếu quyền <b>pages_show_list</b> (thêm rồi Generate lại), hoặc app đang ở chế độ Live (chuyển về Development, để bạn là admin/tester).</p>
+   </div></div></div>`;
+}
+function expiryText(e){
+ if(e===0)return '<span class="pill on">Vĩnh viễn</span>';
+ if(e==null)return '<span class="muted">—</span>';
+ const now=Date.now()/1000;const d=new Date(e*1000).toLocaleDateString('vi-VN');
+ if(e<now)return '<span class="pill off">Đã hết hạn</span>';
+ const days=Math.round((e-now)/86400);
+ return days<14?`<span class="pill off">${d} (${days} ngày)</span>`:`<span class="muted">${d}</span>`;
+}
+async function saveFbApp(){const id=$('#fbAppId').value.trim();const sec=$('#fbAppSecret').value.trim();
+ if(!id&&!sec)return toast('Nhập App ID hoặc Secret');
+ try{await api('/api/fb/app','POST',{appId:id,appSecret:sec});toast('Đã lưu & khóa cấu hình App');window._editFbApp=false;renderToken()}catch(e){toast('Lỗi: '+e.message)}}
+function editFbApp(){window._editFbApp=true;renderToken()}
+function cancelEditFbApp(){window._editFbApp=false;renderToken()}
+async function clearFbApp(){if(!await confirmModal('Xóa cấu hình App Facebook?','App ID + Secret sẽ bị xóa, hệ thống về trống. Token các Trang vẫn giữ.','Xóa','btn-danger'))return;
+ try{await api('/api/fb/app','POST',{clear:true});toast('Đã xóa cấu hình App');renderToken()}catch(e){toast('Lỗi: '+e.message)}}
+async function deletePageToken(fid,name){
+ if(!await confirmModal('Xóa Trang khỏi danh sách?','Trang "'+name+'" sẽ bị gỡ token + xóa khỏi danh sách. Nếu Trang còn nằm trong route thì sẽ hiện lại (xóa route ở tab Nhóm → Trang).','Xóa','btn-danger'))return;
+ try{await api('/api/token/delete','POST',{fanpageId:fid});toast('Đã xóa Trang');window._fbpages=undefined;renderToken()}catch(e){toast('Lỗi: '+e.message)}}
+async function refreshTok(){const el=$('#tokmsg');el.textContent='Đang tìm các Trang…';
+ try{const r=await fetch('/api/token/refresh',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({userToken:$('#utok').value.trim(),pageRefs:($('#pageids')&&$('#pageids').value)||''})});
+  const j=await r.json().catch(()=>({}));
+  if(r.status===401){show(false);return}
+ if(!r.ok)throw new Error((j.error||('HTTP '+r.status))+(j.detail?('  ·  '+j.detail):''));
+  window._fbpages=undefined;
+  el.textContent='Đã tìm thấy '+j.result.length+' Trang: '+j.result.map(x=>x.name).join(', ');toast('Đã cấp token cho '+j.result.length+' Trang');renderToken();
+ }catch(e){el.textContent='Lỗi: '+e.message}}
+
+async function renderGbp(){const s=await api('/api/gbp/status');window._gbps=s.businesses||[];const el=$('#gbp');
+ const sess=s.session||{};const login=s.login||{};const rows=(s.businesses||[]);const editing=!!window._gbpEditing;
+ el.innerHTML=`<div class="card"><div class="card-head"><b>Session Playwright</b><button class="btn-ghost" onclick="renderGbp()">${ic('refresh')} Làm mới</button></div>
+  <p class="muted" style="margin:0 0 10px">Google Business dùng phiên đăng nhập Google đã lưu để Playwright mở trình duyệt và đăng bài. Google không công bố hạn chính xác; hạn bên dưới là ước tính theo cookie lưu trong session.</p>
+  <div class="table-wrap"><table><tbody>
+   <tr><th>Trạng thái</th><td>${sess.hasSession?(sess.expired?'<span class="pill off">có session nhưng có thể hết hạn</span>':'<span class="pill on">đã có session</span>'):'<span class="pill off">chưa có session</span>'}</td></tr>
+   <tr><th>Cập nhật lần cuối</th><td>${sess.updatedAt?new Date(sess.updatedAt).toLocaleString('vi-VN'):'—'}</td></tr>
+   <tr><th>Hạn ước tính</th><td>${gbpExpiryText(sess.expiresAt,sess.expired)}</td></tr>
+  </tbody></table></div>
+  <div class="row" style="margin-top:12px">
+   ${window._gbpStarting
+     ? `<button class="btn-primary" disabled><span class="spin"></span> Đang khởi động trình duyệt… (10-15 giây, đừng bấm lại)</button>`
+     : (login.active
+        ? `<button class="btn-success" onclick="gbpSaveLogin()">Lưu session (sau khi đăng nhập xong)</button><button class="btn-danger" onclick="gbpCancelLogin()">Hủy</button>`
+        : `<button class="btn-primary" onclick="gbpStartLogin()">${sess.hasSession?'Cập nhật session':'Mở trình duyệt đăng nhập'}</button>`)}
+  </div>
+  ${login.active&&login.vnc?`<div style="margin-top:12px">
+   <div class="cardmsg busy" style="display:block;margin-bottom:8px">Đăng nhập Google ngay trong khung dưới (nhập email/mật khẩu/2FA). Xong vào được tài khoản thì bấm <b>Lưu session</b> ở trên.</div>
+   <iframe src="/vnc/vnc.html?autoconnect=true&resize=remote&path=vnc/websockify&reconnect=true" style="width:100%;height:560px;border:1px solid var(--border);border-radius:var(--r-sm);background:#000" title="Đăng nhập Google Business"></iframe>
+  </div>`:''}
+  ${!login.active?`<p class="field-help" style="margin-top:8px">Bấm để mở trình duyệt đăng nhập Google. Trên VPS, trình duyệt hiện ngay trong khung dưới (noVNC) để bạn tự nhập tài khoản.</p>`:''}
+  <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+   <b style="font-size:var(--fs-sm)">Tải session lên (cho máy chủ / VPS không màn hình)</b>
+   <p class="field-help" style="margin:4px 0 8px">VPS không mở được trình duyệt đăng nhập. Ở <b>máy local</b> chạy <code>npm run gbp:login</code> để đăng nhập Google → sinh file <code>data/gbp-session.json</code>. Chọn file đó để tải lên đây:</p>
+   <input type="file" accept="application/json,.json" onchange="gbpUploadSession(this)">
+  </div></div>
+ <div class="card"><div class="card-head"><b>Hồ sơ Google Business</b>${editing?'<button class="btn-ghost" onclick="gbpCancelEditBiz()">Đóng chỉnh sửa</button>':'<button class="btn-ghost" onclick="gbpEditBiz()">Chỉnh sửa</button>'}</div>
+  <p class="muted" style="margin:0 0 10px">Lưu tên và Business/Profile ID một lần. Sau đó tab <b>Nhóm → Trang</b> sẽ chọn bằng dropdown, không cần nhập số lại.</p>
+  <div id="gbpBizRows">${editing?(rows.length?rows.map((b,i)=>gbpBizRow(b,i)).join(''):'<p class="empty" style="padding:20px">Chưa có hồ sơ nào. Bấm “Thêm hồ sơ” để lưu ID Google Business.</p>'):(rows.length?gbpBizTable(rows):'<p class="empty" style="padding:20px">Chưa có hồ sơ nào. Bấm <b>Chỉnh sửa</b> để thêm ID Google Business.</p>')}</div>
+  <div class="row" style="margin-top:12px">${editing?'<button class="btn-ghost" onclick="gbpAddBiz()">+ Thêm hồ sơ</button><button class="btn-primary" onclick="gbpSaveBiz()">Lưu danh sách</button>':''}<span class="muted" id="gbpmsg" role="status" aria-live="polite"></span></div>
+  <p class="field-help" style="margin-top:8px">ID là số bạn thấy trong Advanced settings của Google Business (chuỗi số dài).</p></div>`;
+}
+function gbpExpiryText(ms,expired){
+ if(!ms)return '<span class="muted">Không xác định</span>';
+ const d=new Date(ms).toLocaleDateString('vi-VN');
+ if(expired)return '<span class="pill off">Có thể đã hết hạn</span>';
+ const days=Math.round((ms-Date.now())/86400000);
+ return days<14?`<span class="pill off">${d} (${days} ngày)</span>`:`<span class="muted">${d}</span>`;
+}
+function gbpBizRow(b,i){return `<div class="row gbprow" data-gbp-row style="align-items:flex-start;margin-bottom:10px">
+ <div class="fieldset"><label>Tên hiển thị</label><input data-gbp-name value="${esc(b.name||'')}" placeholder="VD: Trường Việt Anh"></div>
+ <div class="fieldset"><label>Business/Profile ID</label><input data-gbp-id value="${esc(b.id||'')}" placeholder="VD: 1234567890..."></div>
+ <button class="btn-danger" onclick="this.closest('[data-gbp-row]').remove()">Xóa</button></div>`}
+function gbpBizTable(rows){return `<div class="table-wrap"><table><thead><tr><th>Tên hiển thị</th><th>Business/Profile ID</th></tr></thead><tbody>${rows.map(b=>`<tr><td>${esc(b.name||'—')}</td><td class="muted">${esc(b.id)}</td></tr>`).join('')}</tbody></table></div>`}
+function gbpEditBiz(){window._gbpEditing=true;renderGbp()}
+function gbpCancelEditBiz(){window._gbpEditing=false;renderGbp()}
+function gbpAddBiz(){const box=$('#gbpBizRows');if(!box)return;if(box.querySelector('.empty'))box.innerHTML='';box.insertAdjacentHTML('beforeend',gbpBizRow({name:'',id:''},Date.now()))}
+function gbpCollectBiz(){return [...document.querySelectorAll('[data-gbp-row]')].map(r=>({name:r.querySelector('[data-gbp-name]').value.trim(),id:r.querySelector('[data-gbp-id]').value.trim()})).filter(x=>x.id)}
+async function gbpSaveBiz(){const msg=$('#gbpmsg');if(msg)msg.textContent='Đang lưu…';
+ try{const r=await api('/api/gbp/businesses','POST',{businesses:gbpCollectBiz()});window._gbps=r.businesses;window._gbpEditing=false;toast('Đã lưu Google Business');if(msg)msg.textContent='Đã lưu '+r.businesses.length+' hồ sơ';renderGbp()}
+ catch(e){if(msg)msg.textContent='Lỗi: '+e.message}}
+async function gbpUploadSession(input){const f=input.files&&input.files[0];if(!f)return;
+ try{const session=JSON.parse(await f.text());await api('/api/gbp/session/upload','POST',{session});toast('Đã tải session lên — Google Business sẵn sàng');renderGbp()}
+ catch(e){toast('Lỗi: '+(e.message||'file không hợp lệ'))}finally{input.value=''}}
+async function gbpStartLogin(){window._gbpStarting=true;renderGbp();
+ try{await api('/api/gbp/login/start','POST');toast('Đã mở trình duyệt Google')}
+ catch(e){toast('Lỗi: '+e.message)}
+ finally{window._gbpStarting=false;renderGbp()}}
+async function gbpSaveLogin(){try{await api('/api/gbp/login/save','POST');toast('Đã lưu session Google Business');renderGbp()}catch(e){toast('Lỗi: '+e.message)}}
+async function gbpCancelLogin(){try{await api('/api/gbp/login/cancel','POST');toast('Đã hủy phiên đăng nhập');renderGbp()}catch(e){toast('Lỗi: '+e.message)}}
+
+async function renderSettings(){const s=(window._st&&window._st.settings)||(await api('/api/status')).settings;
+ let z={};try{z=await api('/api/zalo/status')}catch(e){z={_err:true}}
+ const qrBlock=(!z.connected&&z.qr)?`<div style="text-align:center;margin:14px 0;padding:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm)">
+    <img src="/api/zalo/qr?t=${Date.now()}" alt="Mã QR đăng nhập Zalo" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;border:1px solid var(--border);border-radius:var(--r-xs);background:#fff">
+    <p class="field-help" style="margin-top:8px">Mở <b>Zalo</b> trên điện thoại → <b>Quét mã QR</b> để đăng nhập.</p></div>`:'';
+ $('#settings').innerHTML=`<div class="card"><div class="card-head"><b>Vận hành</b></div>
+  <div class="cardmsg busy" style="display:block;margin-bottom:12px">Tự đăng hay chờ duyệt được đặt riêng cho từng kênh trong tab <b>Nhóm → Trang</b>. Kênh không bật tự đăng sẽ vào <b>Bài viết</b> để duyệt.</div>
+  <label class="sw"><input type="checkbox" ${s.paused?'checked':''} onchange="setS('paused',this.checked)"> <div><b>Tạm dừng nhận ảnh</b><div class="muted">Ngừng gom ảnh mới từ các nhóm.</div></div></label>
+  <div class="collapse-head" style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px" onclick="toggleField('grpfilter')"><label>Lọc danh sách nhóm hiển thị</label><span class="collapse-state">${((s.groupAllowlist||[]).length)?'đang lọc '+(s.groupAllowlist||[]).length+' nhóm':'hiện tất cả'} <span class="chev" id="arrow_grpfilter">${ic('chevron',14)}</span></span></div>
+  <div id="fld_grpfilter" class="hide">
+    <p class="field-help" style="margin:8px 0">Dùng tài khoản chính lộ nhiều nhóm riêng? Điền <b>mã nhóm</b> muốn hiện (mỗi dòng 1) — dropdown chọn nhóm ở <b>Nhóm → Trang</b> sẽ chỉ hiện những nhóm đó. Để trống = hiện tất cả. Nhóm đã cấu hình route luôn hiện.</p>
+    <textarea id="groupAllow" rows="4" placeholder="Mỗi dòng 1 mã nhóm (threadId)">${esc((s.groupAllowlist||[]).join('\n'))}</textarea>
+    <div class="row" style="margin-top:8px;gap:8px"><button class="btn-primary" onclick="saveGroupAllow()">Lưu lọc</button><button class="btn-ghost" onclick="showAllGroups()">${ic('ext',14)} Xem mã tất cả nhóm để copy</button></div>
+    <div id="allGroupsRef" style="margin-top:8px;max-height:220px;overflow:auto"></div>
+  </div>
+ </div>
+ <div class="card"><div class="card-head"><b>Tài khoản Zalo</b>
+   <span class="pill ${z.connected?'on':'off'}">${z._err?'mất liên lạc service…':(z.connected?'Đã kết nối':(z.relogging?'Đang chờ quét QR…':'Mất kết nối'))}</span></div>
+ <p class="muted" style="margin:2px 0 0">${z.ownId?('ID tài khoản đang đăng nhập: <b>'+esc(z.ownId)+'</b>'):(z.hasCreds?'Đã có phiên đăng nhập.':'Chưa đăng nhập tài khoản nào.')}</p>
+  ${!z.connected?`<div class="cardmsg err" style="margin-top:12px;display:block">${z.relogging?'Đang chờ đăng nhập lại. Nếu có QR bên dưới thì quét bằng Zalo điện thoại.':'Zalo đang mất kết nối nên bot chưa nghe được ảnh mới. Bấm Kết nối lại để thử phiên đã lưu trước.'}</div>`:''}
+  ${qrBlock}
+  <div class="row" style="margin-top:12px">${!z.connected?`<button class="btn-primary" onclick="zaloReconnect()" ${z.relogging?'disabled':''}>${ic('refresh')} Kết nối lại</button>`:''}<button class="btn-danger" onclick="zaloLogout()">Đăng xuất / Đổi tài khoản</button><button class="btn-ghost" onclick="renderSettings()">${ic('refresh')} Làm mới</button></div>
+  <p class="field-help" style="margin-top:8px">Đổi tài khoản Zalo diễn ra <b>ngay, không khởi động lại</b> service. Khi bấm Đăng xuất sẽ hỏi có <b>xoá dữ liệu tài khoản cũ</b> không (cấu hình Nhóm→Page + bài chờ duyệt). <b>Token Facebook luôn được giữ</b> — chỉ cần map nhóm của tài khoản mới tới Trang cũ là kết nối lại được.</p>
+ </div>`;
+ // Claude API card
+ let cl={hasKey:false,masked:'',model:''};try{cl=await api('/api/claude/status')}catch{}
+ window._claudeModel=cl.model;
+ $('#settings').innerHTML+= `<div class="card" id="claudeCard"><div class="card-head"><b>Claude AI</b><span class="pill ${cl.hasKey?'on':'off'}" id="claudePill">${cl.hasKey?'Đã có key':'Chưa có key'}</span></div>
+  ${cl.hasKey?'':'<p class="muted" style="margin:0 0 12px">Chưa có API key — AI viết caption sẽ không hoạt động.</p>'}
+  <div class="fieldset" style="margin:0 0 10px"><label for="claudeKeyIn">API Key (sk-ant-…)</label>
+   <input id="claudeKeyIn" type="text" placeholder="sk-ant-api03-…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other" name="claude-api-key-field"></div>
+  <div class="row" style="gap:8px">
+   <button class="btn-primary" onclick="saveAndTestClaude()">${ic('zap',15)} Lưu & kiểm tra</button>
+   ${cl.hasKey?`<button class="btn-ghost" onclick="testClaudeKey()">Kiểm tra lại</button><button class="btn-quiet danger" style="margin-left:auto" onclick="clearClaudeKey()">${ic('trash',14)} Xoá key</button>`:''}
+  </div>
+  <div id="claudeTestResult" style="margin-top:10px"></div>
+ </div>`;
+ if(!z.connected)startZaloPoll();}
+async function clearClaudeKey(){if(!await confirmModal('Xoá API key Claude?','Hệ thống sẽ về trống — AI ngừng viết caption tới khi bạn nhập key mới.','Xoá key','btn-danger'))return;
+ try{await api('/api/claude/key','POST',{clear:true});toast('Đã xoá key — hệ thống trống');$('#claudeKeyIn').value='';renderSettings()}catch(e){toast('Lỗi: '+e.message)}}
+async function saveAndTestClaude(){const k=$('#claudeKeyIn').value.trim();const r=$('#claudeTestResult');
+ if(k&&!k.startsWith('sk-ant-')){if(r)r.innerHTML=`<div class="cardmsg err" style="display:block">Key phải bắt đầu bằng <b>sk-ant-</b>. Ô đang chứa: <code>${esc(k.slice(0,14))}…</code> — xoá sạch rồi dán lại key thật.</div>`;return}
+ if(r)r.innerHTML=`<span class="muted"><span class="spin"></span> Đang lưu & kiểm tra…</span>`;
+ try{
+  if(k){await api('/api/claude/key','POST',{key:k});$('#claudeKeyIn').value=''}
+  await testClaudeKey(true);
+  try{const s=await api('/api/claude/status');const p=$('#claudePill');if(p){p.className='pill '+(s.hasKey?'on':'off');p.textContent=s.hasKey?'Đã có key':'Chưa có key'}window._claudeModel=s.model}catch{}
+ }catch(e){if(r)r.innerHTML=`<div class="cardmsg err" style="display:block">Lỗi: ${esc(e.message)}</div>`}}
+const CLAUDE_MODELS=[
+ {id:'claude-sonnet-4-6',label:'Sonnet 4.6 — cân bằng (khuyên dùng)'},
+ {id:'claude-haiku-4-5-20251001',label:'Haiku 4.5 — nhanh, rẻ'},
+ {id:'claude-opus-4-8',label:'Opus 4.8 — mạnh nhất'},
+];
+async function saveClaudeKey(){const k=$('#claudeKeyIn').value.trim();const r=$('#claudeTestResult');
+ if(!k)return toast('Nhập API key trước');
+ if(!k.startsWith('sk-ant-')){if(r)r.innerHTML=`<div class="cardmsg err" style="display:block">Key phải bắt đầu bằng <b>sk-ant-</b>. Ô đang chứa: <code>${esc(k.slice(0,12))}…</code> — xoá sạch rồi dán lại key thật.</div>`;return}
+ try{await api('/api/claude/key','POST',{key:k});if(r)r.innerHTML=`<div class="cardmsg ok" style="display:block">Đã lưu key. Bấm <b>Kiểm tra kết nối</b> để xác nhận.</div>`;$('#claudeKeyIn').value='';renderSettings()}
+ catch(e){if(r)r.innerHTML=`<div class="cardmsg err" style="display:block">Lưu lỗi: ${esc(e.message)}</div>`}}
+async function setClaudeModel(m){try{await api('/api/claude/key','POST',{model:m});window._claudeModel=m;toast('Đã chọn '+m)}catch(e){toast('Lỗi: '+e.message)}}
+async function testClaudeKey(){const r=$('#claudeTestResult');if(r)r.innerHTML=`<span class="muted"><span class="spin"></span> Đang kiểm tra…</span>`;
+ try{const d=await api('/api/claude/test');
+  const sel=window._claudeModel||d.model||'claude-sonnet-4-6';
+  const picker=`<div class="fieldset" style="margin:10px 0 0"><label for="claudeModelSel">Chọn model dùng để viết caption</label>
+   <select id="claudeModelSel" onchange="setClaudeModel(this.value)">${CLAUDE_MODELS.map(m=>`<option value="${m.id}"${m.id===sel?' selected':''}>${m.label}</option>`).join('')}</select></div>`;
+  if(r)r.innerHTML=d.ok?`<div class="cardmsg ok" style="display:block">Kết nối thành công — model thử: <b>${esc(d.model)}</b></div>`+picker:`<div class="cardmsg err" style="display:block">Lỗi: ${esc(d.error)}</div>`
+ }catch(e){if(r)r.innerHTML=`<div class="cardmsg err" style="display:block">${esc(e.message)}</div>`}}
+let _zpoll;
+function startZaloPoll(){clearInterval(_zpoll);_zpoll=setInterval(async()=>{
+  if(cur!=='settings'){clearInterval(_zpoll);return}
+  let z;try{z=await api('/api/zalo/status')}catch(e){return}
+  if(z.connected){clearInterval(_zpoll)}
+  renderSettings();
+},4000);}
+async function zaloLogout(){
+ const choice=await modal('Đăng xuất / đổi tài khoản Zalo','Kết nối hiện tại sẽ ngắt và hiện mã QR để quét tài khoản mới (không khởi động lại service).\n\nDữ liệu cũ (cấu hình Nhóm→Trang, bài chờ duyệt) — token Facebook luôn được giữ.',[
+  {label:'Đăng xuất · GIỮ dữ liệu',value:'keep',cls:'btn-primary'},
+  {label:'Đăng xuất + XOÁ dữ liệu cũ',value:'wipe',cls:'btn-danger'},
+  {label:'Huỷ',value:null,cls:'btn-ghost'},
+ ]);
+ if(!choice)return;
+ const wipe=choice==='wipe';
+ window._zgroups=undefined;window._fbpages=undefined;window._routes=undefined;window._zaloWasDown=true;
+ api('/api/zalo/logout','POST',{wipe}).then(()=>{toast(wipe?'Đã đăng xuất & xoá dữ liệu cũ — chờ mã QR…':'Đã đăng xuất — chờ mã QR…');startZaloPoll();status();setTimeout(()=>renderSettings(),1200)}).catch(e=>toast('Lỗi: '+e.message));
+}
+async function zaloReconnect(){
+ try{
+  await api('/api/zalo/reconnect','POST');
+  window._zgroups=undefined;window._zaloWasDown=true;
+  toast('Đang kết nối lại Zalo…');
+  startZaloPoll();status();
+  if(cur==='settings')setTimeout(()=>renderSettings(),900);
+ }catch(e){toast('Lỗi: '+e.message)}
+}
+async function setS(k,v){await api('/api/settings','POST',{[k]:v});toast('Đã cập nhật');status()}
+
+async function renderLogs(){const ls=await api('/api/logs');$('#logs').innerHTML=`<div class="card"><div class="card-head"><b>Nhật ký hoạt động</b></div>`+
+ (ls.length?ls.map(l=>`<div class="logline"><time>${new Date(l.t).toLocaleTimeString('vi-VN')}</time><span>${esc(l.line)}</span></div>`).join(''):'<p class="muted">Chưa có nhật ký.</p>')+`</div>`}
+
+async function renderPosted(){const ps=await api('/api/posted');const el=$('#posted');
+ if(!ps.length){el.innerHTML=`<div class="card"><div class="empty">${svg(ICON.posted).replace('18','40')}<div>Chưa có bài nào được duyệt.<br>Sau khi bạn <b>Duyệt</b> bài ở Chờ duyệt, bài sẽ hiện ở đây kèm link.</div></div></div>`;return}
+ const lim=window._postedN||30;const shown=ps.slice(0,lim);const rest=ps.length-shown.length;
+ const fbDone=(p)=>((p.approvals&&p.approvals.facebook&&p.approvals.facebook.status)==='posted')||(p.links&&p.links.length);
+ const gbpDone=(p)=>p.approvals&&p.approvals.gbp&&p.approvals.gbp.status==='posted'&&!fbDone(p);
+ const pub=shown.filter(p=>fbDone(p)&&p.published);const nhap=shown.filter(p=>fbDone(p)&&!p.published);const gbp=shown.filter(gbpDone);
+ const section=(title,arr,kind)=>arr.length?`<p class="section-title" style="margin:6px 0 10px">${title} (${arr.length})</p>`+arr.map(p=>postCard(p,kind)).join(''):'';
+ el.innerHTML=section('Công khai trên Facebook',pub,'pub')+section('Nháp trên Facebook',nhap,'nhap')+section('Google Business',gbp,'gbp')
+  +(rest>0?`<div class="row" style="justify-content:center;margin-top:6px"><button class="btn-ghost" onclick="morePosted()">Xem thêm ${rest} bài</button></div>`:'');
+}
+function morePosted(){window._postedN=(window._postedN||30)+30;renderPosted()}
+function postCard(p,kind){
+ const imgs=p.imageUrls||[];const vids=p.videoUrls||[];const links=(p.links||[]).filter(Boolean);
+ const gbpPosted=p.approvals&&p.approvals.gbp&&p.approvals.gbp.status==='posted';
+ const gbpLinks=((p.approvals&&p.approvals.gbp&&p.approvals.gbp.links)||[]).filter(Boolean);
+ const gbpManage=p.gbpLocationId?`https://business.google.com/n/${esc(p.gbpLocationId)}/posts`:'';
+ const linkLabel=kind==='pub'?'Mở bài công khai':(kind==='gbp'?'Mở Google Business':'Mở bản nháp');
+ const channelNote=p.partial?'<p class="field-help">Bài này còn kênh khác đang chờ duyệt, nên ở đây chỉ hiển thị kênh đã xử lý.</p>':'';
+ const gbpRow=gbpPosted?`<div class="row" style="gap:8px;margin-top:4px"><span class="pill on">Google Business đã đăng</span>${gbpLinks.length?gbpLinks.map(l=>`<a class="btn-ghost postlink" href="${esc(l)}" target="_blank" rel="noopener">${ic('ext',14)} Mở bài Google</a>`).join(''):(gbpManage?`<a class="btn-ghost postlink" href="${gbpManage}" target="_blank" rel="noopener">${ic('ext',14)} Mở quản lý bài Google</a>`:'')}</div>`:'';
+ const longCaption=String(p.caption||'').length>260||String(p.caption||'').split('\n').length>5;
+ return `<div class="card" data-post="${p.id}">
+  <div class="card-head"><b>${esc(p.routeLabel||p.threadId||'Bài đăng')}</b><span class="pill ${kind==='pub'||kind==='gbp'?'on':'off'}">${kind==='pub'?'Công khai':(kind==='gbp'?'Google Business':'Nháp')}</span></div>
+  <div class="muted" style="font-size:var(--fs-xs)">${p.postedAt?new Date(p.postedAt).toLocaleString('vi-VN'):''} · ${imgs.length} ảnh${vids.length?(' + '+vids.length+' video'):''}</div>
+  <div class="postmini">${imgs.slice(0,8).map(u=>`<img src="${u}" loading="lazy" alt="">`).join('')}${vids.map(()=>`<span class="vid">${ic('film')}</span>`).join('')}</div>
+  ${p.caption?`<div class="postcap fbpost-text ${longCaption?'clamped':''}" id="capview_${p.id}">${esc(p.caption)}</div>${longCaption?`<div class="caption-more" style="padding-left:0"><button id="capmore_${p.id}" onclick="toggleCaption('${p.id}')" aria-expanded="false">xem thêm</button></div>`:''}`:''}
+  ${links.length?`<div class="row" style="gap:8px;margin-top:4px">${links.map(l=>`<a class="btn-ghost postlink" href="${esc(l)}" target="_blank" rel="noopener">${ic('ext',14)} ${linkLabel}</a>`).join('')}</div>`:'<p class="field-help">(không lấy được link)</p>'}
+  ${gbpRow}
+  ${channelNote}
+  <div class="row" style="gap:8px;margin-top:10px">
+   ${(!p.partial&&kind==='nhap')?`<button class="btn-success" onclick="postPublish('${p.id}')">${ic('checkCircle')} Đăng thật (công khai)</button>`:''}
+   ${(!p.partial&&kind!=='gbp')?`<button class="btn-ghost" onclick="togglePostEdit('${p.id}')">${ic('pencil')} Sửa</button>
+   <button class="btn-danger" onclick="postDelete('${p.id}')">${ic('trash')} Xoá</button>`:''}
+   <span class="cardmsg" id="pmsg_${p.id}" role="status" aria-live="polite"></span>
+  </div>
+  <div class="fbedit hide" id="pedit_${p.id}">
+   <p class="section-title">Sửa nội dung (cập nhật lên Facebook)</p>
+   <textarea id="pcap_${p.id}" aria-label="Nội dung bài">${esc(p.caption||'')}</textarea>
+   <div class="row" style="margin-top:8px"><button class="btn-primary" onclick="postEdit('${p.id}')">Lưu &amp; cập nhật FB</button><button class="btn-ghost" onclick="togglePostEdit('${p.id}')">Đóng</button></div>
+  </div>
+ </div>`;
+}
+function togglePostEdit(id){const e=$('#pedit_'+id);if(e)e.classList.toggle('hide')}
+function pMsg(id,html,kind){const e=$('#pmsg_'+id);if(e){e.className='cardmsg'+(kind?' '+kind:'');e.innerHTML=html}}
+function postBusy(id,on){document.querySelectorAll('[data-post="'+id+'"] button').forEach(b=>b.disabled=on)}
+async function postPublish(id){if(!await confirmModal('Đăng CÔNG KHAI bài nháp?','Bài đang là nháp trên Facebook sẽ được công khai cho mọi người xem.','Đăng công khai','btn-success'))return;postBusy(id,true);pMsg(id,'<span class="spin"></span>Đang đăng công khai…','busy');
+ try{await api('/api/posted/'+id+'/publish','POST');toast('Đã đăng công khai');render();status()}catch(e){pMsg(id,ic('alert')+' '+esc(e.message),'err');postBusy(id,false)}}
+async function postEdit(id){const cap=($('#pcap_'+id)||{}).value||'';postBusy(id,true);pMsg(id,'<span class="spin"></span>Đang cập nhật…','busy');
+ try{await api('/api/posted/'+id+'/edit','POST',{caption:cap});toast('Đã cập nhật bài');renderPosted()}catch(e){pMsg(id,ic('alert')+' '+esc(e.message),'err');postBusy(id,false)}}
+async function postDelete(id){if(!await confirmModal('Xoá bài khỏi Facebook?','Bài sẽ bị xoá hẳn khỏi Facebook. Không khôi phục được.','Xoá bài','btn-danger'))return;postBusy(id,true);pMsg(id,'<span class="spin"></span>Đang xoá…','busy');
+ try{await api('/api/posted/'+id+'/delete','POST');toast('Đã xoá bài');renderPosted()}catch(e){pMsg(id,ic('alert')+' '+esc(e.message),'err');postBusy(id,false)}}
+
+(async()=>{try{await api('/api/me');show(true);boot()}catch(e){show(false)}})();
+</script>
+</body>
+</html>

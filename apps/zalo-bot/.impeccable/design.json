@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-25T00:00:00.000Z",
+  "title": "Design System: Auto-Post · Zalo → Facebook",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Xanh Trực ban", "canonical": "#2454c7", "tonalRamp": ["#0d1c45", "#12275f", "#163480", "#1c449f", "#2454c7", "#5277d6", "#90abe8", "#d3def9"] },
+      "primary-deep": { "role": "primary", "displayName": "Xanh Đậm", "canonical": "#1c449f", "tonalRamp": ["#0a1838", "#0f2150", "#142d6e", "#1c449f", "#2c5cc4", "#6488db", "#9db6ea", "#d6e0f8"] },
+      "primary-tint": { "role": "primary", "displayName": "Xanh Tint", "canonical": "#eaf0fd", "tonalRamp": ["#1c449f", "#2c5cc4", "#5e84db", "#90abe8", "#bcd0f3", "#dbe6fb", "#eaf0fd", "#f6f9ff"] },
+      "accent-amber": { "role": "secondary", "displayName": "Hổ phách Cảnh báo", "canonical": "#f5a524", "tonalRamp": ["#3d2700", "#5e3c00", "#8a5800", "#b87600", "#f5a524", "#f8bd5b", "#fbd697", "#fdedd1"] },
+      "success": { "role": "tertiary", "displayName": "Xanh lá Hoàn tất", "canonical": "#1a9e54", "tonalRamp": ["#062a16", "#0a4424", "#0f5e33", "#157a41", "#1a9e54", "#4bbd7d", "#86d6a8", "#cdeedb"] },
+      "danger": { "role": "tertiary", "displayName": "Đỏ Dứt khoát", "canonical": "#d9412b", "tonalRamp": ["#3a0f08", "#5c170d", "#8a2316", "#b3301f", "#d9412b", "#e57361", "#f0a89c", "#f9ddd7"] },
+      "ink": { "role": "neutral", "displayName": "Mực", "canonical": "#1b2536", "tonalRamp": ["#1b2536", "#33405a", "#4d5b78", "#6b7689", "#9aa4b5", "#c3cad6", "#e3e8f0", "#f7f9fc"] },
+      "muted": { "role": "neutral", "displayName": "Xám Phụ", "canonical": "#5f6a7d", "tonalRamp": ["#1b2536", "#33405a", "#4d5b78", "#5f6a7d", "#9aa4b5", "#c3cad6", "#e3e8f0", "#f7f9fc"] },
+      "bg": { "role": "neutral", "displayName": "Nền (Mặt bàn)", "canonical": "#eef1f7", "tonalRamp": ["#1b2536", "#33405a", "#4d5b78", "#6b7689", "#9aa4b5", "#c3cad6", "#e3e8f0", "#eef1f7"] },
+      "surface": { "role": "neutral", "displayName": "Mặt Thẻ", "canonical": "#ffffff", "tonalRamp": ["#33405a", "#4d5b78", "#6b7689", "#9aa4b5", "#c3cad6", "#e3e8f0", "#f7f9fc", "#ffffff"] },
+      "border": { "role": "neutral", "displayName": "Viền", "canonical": "#e3e8f0", "tonalRamp": ["#33405a", "#4d5b78", "#6b7689", "#9aa4b5", "#c3cad6", "#d6dce6", "#e3e8f0", "#f1f4f9"] }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Tiêu đề màn đăng nhập; bậc lớn nhất, dùng tiết kiệm." },
+      "title": { "displayName": "Title", "purpose": "Tên thương hiệu và tiêu đề trang trên topbar." },
+      "subtitle": { "displayName": "Subtitle", "purpose": "Tiêu đề bên trong thẻ — tên route, tên khối cấu hình." },
+      "body": { "displayName": "Body", "purpose": "Chữ thân chính, nội dung textarea, mô tả. ~65–75ch cho đoạn dài." },
+      "label": { "displayName": "Label", "purpose": "Nhãn mục và tiêu đề cột — IN HOA giãn chữ, mốc định hướng nhỏ." },
+      "mono": { "displayName": "Mono", "purpose": "Dòng nhật ký, căn cột thời gian." }
+    },
+    "shadows": [
+      { "name": "card-soft", "value": "0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.06)", "purpose": "Bóng mặc định cho thẻ và thẻ đăng nhập. Khuếch tán, gần vô hình." },
+      { "name": "toast-pop", "value": "0 10px 30px rgba(0,0,0,.2)", "purpose": "Toast — phần tử nổi cao nhất, tách hẳn khỏi mặt phẳng." },
+      { "name": "focus-ring", "value": "0 0 0 3px #eaf0fd", "purpose": "Quầng focus của input (Xanh Tint)." },
+      { "name": "focus-ring-success", "value": "0 0 0 3px rgba(26,158,84,.18)", "purpose": "Quầng quanh chấm trạng thái Zalo đã kết nối." }
+    ],
+    "motion": [
+      { "name": "transition-control", "value": "0.18s", "purpose": "Chuyển trạng thái nút/input (background, border, box-shadow). Easing mặc định ease." },
+      { "name": "press", "value": "transform .05s", "purpose": "Lún nhẹ 1px khi :active trên nút." },
+      { "name": "transition-toast", "value": "0.25s", "purpose": "Toast trượt + mờ vào/ra." },
+      { "name": "sidebar-slide", "value": "0.2s", "purpose": "Mở/đóng sidebar trên mobile." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "760px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Hành động chính trên mỗi màn (Đăng nhập, Lưu cấu hình).",
+      "html": "<button class=\"ds-btn-primary\">Lưu cấu hình</button>",
+      "css": ".ds-btn-primary { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #fff; background: #2454c7; border: 0; border-radius: 10px; padding: 9px 15px; cursor: pointer; transition: background .18s, box-shadow .18s, transform .05s; } .ds-btn-primary:hover { background: #1c449f; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #2454c7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Success Button",
+      "kind": "button",
+      "refersTo": "button-success",
+      "description": "Riêng cho hành động 'Đăng công khai'.",
+      "html": "<button class=\"ds-btn-success\">Đăng công khai</button>",
+      "css": ".ds-btn-success { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #fff; background: #1a9e54; border: 0; border-radius: 10px; padding: 9px 15px; cursor: pointer; transition: background .18s, transform .05s; } .ds-btn-success:hover { background: #157a41; } .ds-btn-success:active { transform: translateY(1px); } .ds-btn-success:focus-visible { outline: 2px solid #1a9e54; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Hành động phụ (Lưu sửa, Đăng nháp, Đăng xuất).",
+      "html": "<button class=\"ds-btn-ghost\">Lưu sửa</button>",
+      "css": ".ds-btn-ghost { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #1b2536; background: #fff; border: 1px solid #e3e8f0; border-radius: 10px; padding: 9px 15px; cursor: pointer; transition: background .18s, border-color .18s, transform .05s; } .ds-btn-ghost:hover { background: #f7f9fc; border-color: #cfd7e3; } .ds-btn-ghost:active { transform: translateY(1px); } .ds-btn-ghost:focus-visible { outline: 2px solid #2454c7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Hành động không hoàn tác (Bỏ bài) — tint nhẹ, không nền đỏ đặc.",
+      "html": "<button class=\"ds-btn-danger\">Bỏ bài</button>",
+      "css": ".ds-btn-danger { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #d9412b; background: #fbeae7; border: 0; border-radius: 10px; padding: 9px 15px; cursor: pointer; transition: background .18s, transform .05s; } .ds-btn-danger:hover { background: #f7dcd7; } .ds-btn-danger:active { transform: translateY(1px); } .ds-btn-danger:focus-visible { outline: 2px solid #d9412b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Trường nhập có nhãn phía trên; focus đổi viền + quầng tint.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Tên gợi nhớ</span><input class=\"ds-input\" placeholder=\"VD: Nhóm Mầm Non Việt Anh\"></label>",
+      "css": ".ds-field { display: block; } .ds-label { display: block; font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #3a4659; margin-bottom: 6px; } .ds-input { width: 100%; font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; color: #1b2536; background: #fff; border: 1px solid #e3e8f0; border-radius: 10px; padding: 10px 12px; transition: border-color .18s, box-shadow .18s; } .ds-input::placeholder { color: #5f6a7d; } .ds-input:focus { outline: 0; border-color: #2454c7; box-shadow: 0 0 0 3px #eaf0fd; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Khối nội dung trắng nổi nhẹ trên mặt bàn; phẳng khi nghỉ.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><b>Nhóm 'Hình ảnh đẹp' → Page Mầm Non Việt Anh</b><span class=\"ds-meta\">25/06/2026 09:14 · 4 ảnh</span></div><p class=\"ds-label-section\">Nội dung bài</p></div>",
+      "css": ".ds-card { background: #fff; border: 1px solid #e3e8f0; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.06); padding: 18px; font-family: 'Be Vietnam Pro', system-ui, sans-serif; color: #1b2536; } .ds-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; } .ds-card-head b { font-size: 15px; font-weight: 700; } .ds-meta { font-size: 12px; color: #5f6a7d; } .ds-label-section { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #5f6a7d; margin: 14px 0 10px; }"
+    },
+    {
+      "name": "Status Pill (on)",
+      "kind": "chip",
+      "refersTo": "pill-on",
+      "description": "Chỉ báo trạng thái tích cực trong bảng (token có, route bật).",
+      "html": "<span class=\"ds-pill-on\">đã cấu hình</span>",
+      "css": ".ds-pill-on { display: inline-block; font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 12px; font-weight: 600; color: #157a41; background: #e4f6ec; border-radius: 99px; padding: 2px 9px; }"
+    },
+    {
+      "name": "Nav Item (active)",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Mục điều hướng đang chọn trong sidebar.",
+      "html": "<button class=\"ds-nav-active\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 12h-6l-2 3h-4l-2-3H2\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/></svg><span>Chờ duyệt</span><span class=\"ds-badge\">3</span></button>",
+      "css": ".ds-nav-active { display: flex; align-items: center; gap: 10px; width: 240px; font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #1c449f; background: #eaf0fd; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; text-align: left; } .ds-nav-active svg { color: #2454c7; flex: none; } .ds-nav-active .ds-badge { margin-left: auto; font-size: 11px; font-weight: 700; color: #3a2a00; background: #f5a524; border-radius: 99px; padding: 1px 7px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Bàn trực ban điềm tĩnh (The Calm Control Desk)",
+    "overview": "Bàn điều phối của một người trực: sáng sủa, gọn gàng, mọi nút trong tầm tay, không báo động thừa. Người dùng là quản trị viên trang trường mầm non không rành kỹ thuật; mở dashboard là thấy ngay còn bao nhiêu bài chờ và cần làm gì, và đăng một bài công khai là việc an tâm, có kiểm soát. Nền là mặt phẳng xanh-xám rất nhạt đỡ các thẻ trắng nổi nhẹ; xanh dương là giọng nói duy nhất của hành động, xanh lá cho việc đã chạy, đỏ cho hành động không hoàn tác, hổ phách cho cảnh báo nhẹ. Màu không bao giờ trang trí — nó luôn nói một điều về trạng thái. Hệ thống từ chối SaaS slop kiểu AI và không giả làm app mạng xã hội; quen thuộc và nhất quán hơn bất ngờ, công cụ biến mất vào công việc.",
+    "keyCharacteristics": [
+      "Phẳng-mặc-định: một bóng đổ mềm duy nhất, độ sâu đến từ tầng màu chứ không từ bóng đậm.",
+      "Một giọng xanh dương: primary chỉ dùng cho hành động chính, mục đang chọn và chỉ báo trạng thái.",
+      "Mật độ thoải mái, đọc rõ tiếng Việt có dấu, dùng tốt trên điện thoại.",
+      "Bo góc dịu (10–14px), không nhọn, không bo tròn quá đà.",
+      "Tiếng Việt đời thường trên mọi nhãn; thuật ngữ kỹ thuật chỉ khi bắt buộc."
+    ],
+    "rules": [
+      { "name": "Quy tắc Một Giọng Nói", "body": "Xanh Trực ban (#2454c7) chỉ dành cho hành động chính, mục đang chọn và viền focus. Nó không bao giờ là màu trang trí. Sự hiếm chính là điều khiến nó có sức nặng.", "section": "colors" },
+      { "name": "Quy tắc Màu Có Nghĩa", "body": "Mọi màu chức năng (xanh lá, đỏ, hổ phách) phải tương ứng một trạng thái thật. Nếu một mảng màu không nói lên trạng thái gì, nó sai — chuyển về neutral.", "section": "colors" },
+      { "name": "Quy tắc Một Họ Chữ", "body": "Toàn bộ giao diện chạy trên Be Vietnam Pro. Không thêm font hiển thị, không cặp font cho sang. Phân cấp = cỡ + trọng lượng, không phải font mới.", "section": "typography" },
+      { "name": "Quy tắc IN HOA Có Chừng", "body": "Chữ IN HOA giãn chữ chỉ dành cho nhãn mục và tiêu đề cột. Không IN HOA tiêu đề, nút hay câu văn.", "section": "typography" },
+      { "name": "Quy tắc Phẳng-Mặc-Định", "body": "Bề mặt phẳng khi nghỉ. Độ sâu trước hết đến từ tầng màu và viền mảnh; bóng đổ chỉ là phương án cuối, và luôn mềm. Bóng đậm + blur nhỏ = giao diện kiểu 2014, cấm.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do giữ Xanh Trực ban (#2454c7) cho đúng hành động chính, mục đang chọn và viền focus — theo Quy tắc Một Giọng Nói.",
+      "Do dùng một bóng đổ mềm duy nhất; tạo độ sâu bằng tầng màu #eef1f7 → #ffffff → #f7f9fc và viền 1px #e3e8f0.",
+      "Do chạy mọi thứ trên Be Vietnam Pro; phân cấp bằng cỡ và trọng lượng (700/600/400), không thêm font.",
+      "Do giữ chữ thân ở Mực (#1b2536); chữ phụ không nhạt hơn Xám Phụ (#5f6a7d), kể cả placeholder. Tương phản thân bài ≥ 4.5:1.",
+      "Do viết nhãn bằng tiếng Việt đời thường; chỉ lộ thuật ngữ (threadId, token, biến môi trường) khi bắt buộc và luôn kèm giải thích.",
+      "Do xác nhận rõ mọi hành động không hoàn tác (đăng công khai, bỏ bài) và nói rõ bài sẽ đi đâu — công khai hay nháp.",
+      "Do kiểm tra ở ≤760px: sidebar thu gọn, nút và vùng chạm đủ lớn, tiêu đề tiếng Việt dài không tràn.",
+      "Do đặt viền focus rõ (outline 2px solid #2454c7) trên mọi phần tử tương tác; thao tác được bằng bàn phím."
+    ],
+    "donts": [
+      "Don't rơi vào SaaS slop kiểu AI: cấm hero gradient, accent tím, lưới thẻ giống hệt nhau lặp vô tận, mẫu số-to-nhãn-nhỏ-gradient.",
+      "Don't làm dashboard giống app mạng xã hội tiêu dùng (Facebook/Instagram). Đây là công cụ vận hành, không phải feed để lướt.",
+      "Don't dùng chữ gradient (background-clip: text) hay glassmorphism trang trí. backdrop-filter chỉ dùng có chức năng (topbar dính).",
+      "Don't dùng viền-sọc-cạnh (border-left/border-right > 1px làm dải màu) trên thẻ, callout hay alert.",
+      "Don't dùng nền đỏ đặc cho nút Bỏ bài — giữ Đỏ Tint + chữ đỏ để hành động phá hủy thấy được mà không hét lên.",
+      "Don't dùng xám nhạt hơn #5f6a7d cho sang; đó là lý do lớn nhất khiến giao diện khó đọc.",
+      "Don't thêm bóng đậm + blur nhỏ (cảm giác app 2014) hay chuyển động trang trí không nói lên trạng thái.",
+      "Don't lồng thẻ trong thẻ quá một bậc, và đừng đổi kiểu một nút Đăng ở hai nơi khác nhau."
+    ]
+  }
+}

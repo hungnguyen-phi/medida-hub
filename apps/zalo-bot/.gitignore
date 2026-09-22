@@ -1,0 +1,17 @@
+node_modules/
+
+# Secret & phiên đăng nhập (KHÔNG commit)
+.env
+.env.local
+zalo-creds.json
+qr.png
+
+# Dữ liệu & output ghi-runtime
+data/
+output/
+tmp/
+media/
+*.log
+
+# Cache công cụ design Impeccable (Claude Code) — artifact máy, KHÔNG commit
+.impeccable/
