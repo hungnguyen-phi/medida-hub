@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -46,12 +47,17 @@ export class NoAuthIntegrationsController {
     @Param('integration') integration: string,
     @Body() body: ConnectIntegrationDto
   ) {
+    // Trước đây throw new Error(...) — Nest coi Error thường (không phải
+    // HttpException) là lỗi hạ tầng, trả về client mỗi "Internal server
+    // error", giấu mất lý do thật (frontend rơi về "Could not add provider").
+    // Đổi sang BadRequestException để message thật (Integration not allowed /
+    // Invalid state / Organization not found) tới được người dùng.
     if (
       !this._integrationManager
         .getAllowedSocialsIntegrations()
         .includes(integration)
     ) {
-      throw new Error('Integration not allowed');
+      throw new BadRequestException('Integration not allowed');
     }
 
     const integrationProvider =
@@ -61,12 +67,14 @@ export class NoAuthIntegrationsController {
       ? 'none'
       : await ioRedis.get(`login:${body.state}`);
     if (!getCodeVerifier) {
-      throw new Error('Invalid state');
+      throw new BadRequestException(
+        'Invalid or expired state — please retry connecting the channel from the beginning (the previous attempt timed out).'
+      );
     }
 
     const organization = await ioRedis.get(`organization:${body.state}`);
     if (!organization) {
-      throw new Error('Organization not found');
+      throw new BadRequestException('Organization not found');
     }
 
     const org = await this._organizationService.getOrgById(organization);
@@ -163,8 +171,16 @@ export class NoAuthIntegrationsController {
           });
         }
 
+        // TRƯỚC ĐÂY: mọi lỗi khác NotEnoughScopes bị thay bằng chữ chung chung
+        // "Authentication failed" — xoá mất lý do THẬT (vd BadBody từ
+        // zalo.provider.ts mang nguyên error_description của Zalo: OA chưa xác
+        // minh, app_id/secret sai, redirect_uri lệch…). Giữ err.message nếu có
+        // để người dùng thấy đúng lý do thay vì phải đoán.
         return res({
-          error: 'Authentication failed',
+          error:
+            (err as any)?.message ||
+            (typeof err === 'string' ? err : '') ||
+            'Authentication failed',
           accessToken: '',
           id: '',
           name: '',

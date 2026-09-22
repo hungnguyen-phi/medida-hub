@@ -101,13 +101,16 @@ services:
   #  Bot Zalo (zca-js) — nguồn ảnh từ nhóm Zalo. KHÔNG expose cổng/domain:
   #  chỉ Hub gọi nội bộ qua /botapi (auth HUB_BOT_TOKEN). Toàn bộ thao tác
   #  (QR, duyệt bài, token FB, GBP…) làm trong trang Zalo của Hub.
-  #  Build từ repo bot (đã có Dockerfile). Nếu deploy bot bằng app Coolify
-  #  RIÊNG (như hiện tại): XÓA service này, đặt ZALO_BOT_URL trỏ địa chỉ nội
-  #  bộ của app đó và set env cho app bot: WEB_HOST=0.0.0.0 + HUB_BOT_TOKEN.
+  #  2026-09-22: gộp vào monorepo tại apps/zalo-bot (trước đây build context
+  #  trỏ thẳng ra github.com/phihung13/zalo-bot-group-put-image-video —
+  #  tách rời 2 repo dễ thất lạc thay đổi). Build LOCAL từ apps/zalo-bot,
+  #  không kéo GitHub ngoài nữa. Nếu deploy bot bằng app Coolify RIÊNG (như
+  #  trước đây): XÓA service này, đặt ZALO_BOT_URL trỏ địa chỉ nội bộ của
+  #  app đó và set env cho app bot: WEB_HOST=0.0.0.0 + HUB_BOT_TOKEN.
   # -----------------------------------------------------------------
   zalo-bot:
     build:
-      context: 'https://github.com/phihung13/zalo-bot-group-put-image-video.git'
+      context: ./apps/zalo-bot
     image: viet-anh-zalo-bot:latest
     container_name: zalo-bot
     restart: always

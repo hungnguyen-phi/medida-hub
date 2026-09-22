@@ -194,11 +194,16 @@ export class PostActivity {
             getIntegration.mentionFormat
           ),
           settings: JSON.parse(p.settings || '{}'),
-          media: await this._postService.updateMedia(
-            p.id,
-            JSON.parse(p.image || '[]'),
-            getIntegration?.convertToJPEG || false
-          ),
+          // .filter(!hidden): ảnh bị ẩn (AI lọc mờ/tối/trùng/nguy hiểm, hoặc
+          // user tự ẩn) vẫn hiện trong composer để xem/mở lại, nhưng KHÔNG BAO
+          // GIỜ được đăng thật — lọc ngay biên giới trước khi gửi cho provider.
+          media: (
+            await this._postService.updateMedia(
+              p.id,
+              JSON.parse(p.image || '[]'),
+              getIntegration?.convertToJPEG || false
+            )
+          ).filter((m: any) => !m?.hidden),
         }))
       ),
       integration
@@ -257,11 +262,14 @@ export class PostActivity {
                   getIntegration.mentionFormat
                 ),
           settings: JSON.parse(p.settings || '{}'),
-          media: await this._postService.updateMedia(
-            p.id,
-            JSON.parse(p.image || '[]'),
-            getIntegration?.convertToJPEG || false
-          ),
+          // .filter(!hidden): xem lý do ở postComment phía trên.
+          media: (
+            await this._postService.updateMedia(
+              p.id,
+              JSON.parse(p.image || '[]'),
+              getIntegration?.convertToJPEG || false
+            )
+          ).filter((m: any) => !m?.hidden),
         }))
       ),
       integration

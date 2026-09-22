@@ -10,6 +10,7 @@ import {
   bot,
   BridgeConfig,
   Card,
+  channelLabel,
   getBotUrl,
   HubChannel,
   isSupportedChannel,
@@ -672,7 +673,7 @@ export const ZaloComponent: FC = () => {
                             .filter((ch) => isSupportedChannel(ch.identifier))
                             .map((ch) => (
                               <option key={ch.id} value={ch.id}>
-                                → {ch.name || ch.id}
+                                → {channelLabel(ch)}
                               </option>
                             ))}
                           </select>

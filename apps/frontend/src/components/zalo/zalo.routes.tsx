@@ -10,6 +10,7 @@ import {
   BotRoute,
   BotRoutesFile,
   Card,
+  channelLabel,
   DangerLink,
   FieldLabel,
   HubChannel,
@@ -373,7 +374,7 @@ export const ZaloRoutesTab: FC<{ zaloLogged: boolean; onChanged?: () => void }> 
                               >
                                 <input type="checkbox" hidden checked={on} onChange={() => toggle(ch.id)} />
                                 {on ? '✓ ' : ''}
-                                {ch.name || ch.id}
+                                {channelLabel(ch)}
                               </label>
                             );
                           })}

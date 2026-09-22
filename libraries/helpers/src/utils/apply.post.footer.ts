@@ -30,16 +30,17 @@ export const applyPostFooter = (content: string, footer: string): string => {
     return body;
   }
 
-  const lines = body.split('\n');
-  const isHashtagLine = (l: string) => {
-    const t = l.trim();
-    return t === '' || /^#[^\s#]+(\s+#[^\s#]+)*$/.test(t);
-  };
-  let idx = lines.length;
-  while (idx > 0 && isHashtagLine(lines[idx - 1])) idx--;
-
-  const head = lines.slice(0, idx).join('\n').replace(/\s+$/, '');
-  const tail = lines.slice(idx).join('\n').trim();
+  // Cụm hashtag cuối bài không nhất thiết đứng RIÊNG DÒNG — AI thường nối
+  // thẳng vào cuối câu cuối cùng ("...một ngày thật vui #a #b"). Bắt dải
+  // "#tag" liên tiếp SÁT CUỐI chuỗi (được ngăn cách bởi khoảng trắng bất kỳ,
+  // kể cả xuống dòng) thay vì đòi hỏi cả dòng chỉ toàn hashtag — nếu không,
+  // dòng có hashtag nối đuôi sẽ bị coi là caption thường và chân bài bị chèn
+  // SAU nó (hashtag trồi lên trên chân bài, đúng lỗi user báo).
+  const trailingHashtags = body.match(/(?:\s*#[^\s#]+)+\s*$/);
+  const head = trailingHashtags
+    ? body.slice(0, trailingHashtags.index).replace(/\s+$/, '')
+    : body.trim();
+  const tail = trailingHashtags ? trailingHashtags[0].trim() : '';
 
   if (tail) {
     return `${head}\n\n${footerBlock}\n\n${tail}`;

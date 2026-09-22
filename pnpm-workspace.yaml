@@ -1,3 +1,8 @@
 packages:
   - apps/*
   - libraries/*
+  # apps/zalo-bot: dự án Node/ESM RIÊNG (repo bot Zalo cũ, gộp vào monorepo
+  # 2026-09-22 bằng git subtree) — tự quản lý bằng npm (package-lock.json
+  # riêng), KHÔNG dùng chung dependency graph pnpm của Postiz. Loại khỏi
+  # workspace để `pnpm install` ở root không "nuốt" nhầm deps của nó.
+  - '!apps/zalo-bot'

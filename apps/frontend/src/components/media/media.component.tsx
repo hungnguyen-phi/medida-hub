@@ -783,6 +783,341 @@ const FramePreview: FC<{
   );
 };
 
+// ============================================================================
+//  Trình quản lý media (2026-09-22) — mở từ nút "Design Media". Gộp MỘT chỗ:
+//  xem lưới toàn bộ ảnh/video đã đính kèm + kéo-thả đổi thứ tự (grid, không
+//  còn dải ngang 40px vỡ trận khi đính 60 ảnh) + sửa từng ảnh bằng Filerobot
+//  ngay tại chỗ + thêm ảnh (thư viện / thiết kế mới) mà không cần đóng modal.
+//  Giữ state RIÊNG (list) trong lúc mở — mỗi thao tác vừa cập nhật list vừa
+//  gọi onChange đẩy ra ngoài, nên form thật luôn đồng bộ dù modal không re-render
+//  theo props ngoài (modal system gọi lại closure con trỏ cũ, xem ADR trong PR).
+//  Bàn phím: ô đang focus dùng phím mũi tên để đổi chỗ — thay thế không-chuột
+//  cho kéo-thả (WCAG 2.2 Dragging Movements).
+// ============================================================================
+type ManagerMediaItem = { id: string; path: string; [k: string]: any };
+
+const MediaManagerModal: FC<{
+  initialMedia: ManagerMediaItem[];
+  onChange: (value: ManagerMediaItem[]) => void;
+  closeModal: () => void;
+}> = ({ initialMedia, onChange, closeModal }) => {
+  const t = useT();
+  const mediaDirectory = useMediaDirectory();
+  const modals = useModals();
+  const [list, setList] = useState<ManagerMediaItem[]>(initialMedia);
+  const [editing, setEditing] = useState<ManagerMediaItem | null>(null);
+
+  const commit = useCallback(
+    (next: ManagerMediaItem[]) => {
+      setList(next);
+      onChange(next);
+    },
+    [onChange]
+  );
+
+  const addMedia = useCallback(
+    (added: ManagerMediaItem[]) => {
+      setList((prev) => {
+        const next = [...prev, ...(Array.isArray(added) ? added : [added])];
+        onChange(next);
+        return next;
+      });
+    },
+    [onChange]
+  );
+
+  const move = useCallback(
+    (from: number, to: number) => {
+      setList((prev) => {
+        if (to < 0 || to >= prev.length || from === to) return prev;
+        const next = [...prev];
+        const [item] = next.splice(from, 1);
+        next.splice(to, 0, item);
+        onChange(next);
+        return next;
+      });
+    },
+    [onChange]
+  );
+
+  const remove = useCallback(
+    (id: string) => {
+      setList((prev) => {
+        const next = prev.filter((m) => m.id !== id);
+        onChange(next);
+        return next;
+      });
+    },
+    [onChange]
+  );
+
+  // Ẩn = vẫn thấy ảnh trong Trình quản lý (bấm mắt để hiện lại) nhưng KHÔNG
+  // đăng lên (lọc ở post.activity.ts lúc đăng thật) — thay vì xoá hẳn, phòng
+  // khi AI/bộ lọc nhóm nhầm một ảnh còn đẹp.
+  const toggleHidden = useCallback(
+    (id: string) => {
+      setList((prev) => {
+        const next = prev.map((m) =>
+          m.id === id ? { ...m, hidden: !m.hidden } : m
+        );
+        onChange(next);
+        return next;
+      });
+    },
+    [onChange]
+  );
+
+  const openInsertFromLibrary = useCallback(() => {
+    modals.openModal({
+      askClose: false,
+      closeOnEscape: true,
+      fullScreen: true,
+      size: 'calc(100% - 80px)',
+      height: 'calc(100% - 80px)',
+      children: (close) => (
+        <MediaBox
+          setMedia={(m) => {
+            addMedia(m);
+            close();
+          }}
+          closeModal={close}
+        />
+      ),
+    });
+  }, [addMedia, modals]);
+
+  const openNewDesign = useCallback(() => {
+    modals.openModal({
+      askClose: false,
+      closeOnEscape: true,
+      removeLayout: true,
+      fullScreen: true,
+      children: (close) => (
+        <FilerobotEditor
+          setMedia={(m) => {
+            addMedia(m);
+            close();
+          }}
+          closeModal={close}
+        />
+      ),
+    });
+  }, [addMedia, modals]);
+
+  if (editing) {
+    return (
+      <FilerobotEditor
+        source={mediaDirectory.set(editing.path)}
+        setMedia={(edited) => {
+          const next = edited?.[0];
+          if (next) {
+            commit(list.map((m) => (m.id === editing.id ? { ...m, ...next } : m)));
+          }
+          setEditing(null);
+        }}
+        closeModal={() => setEditing(null)}
+      />
+    );
+  }
+
+  return (
+    <div className="bg-white text-black relative z-[400] flex flex-col h-full min-h-0 overflow-hidden">
+      <div className="shrink-0 flex items-center gap-[8px] flex-wrap px-[16px] py-[10px] border-b border-[#e5e7eb] bg-[#fafafa]">
+        <span className="text-[14px] font-[700] text-[#111827] me-[6px]">
+          {t('media_manager_title', 'Manage media')} ({list.length})
+        </span>
+        <button
+          type="button"
+          onClick={openInsertFromLibrary}
+          className="h-[36px] px-[12px] rounded-[8px] bg-[#eef0f2] text-[#111827] text-[13px] font-[600] hover:bg-[#e5e7eb] transition-colors"
+        >
+          + {t('insert_media', 'Insert Media')}
+        </button>
+        <button
+          type="button"
+          onClick={openNewDesign}
+          className="h-[36px] px-[12px] rounded-[8px] bg-[#eef0f2] text-[#111827] text-[13px] font-[600] hover:bg-[#e5e7eb] transition-colors"
+        >
+          + {t('design_media_new', 'New design')}
+        </button>
+        <button
+          type="button"
+          onClick={closeModal}
+          aria-label={t('close', 'Close')}
+          className="ms-auto shrink-0 w-[36px] h-[36px] rounded-[8px] flex items-center justify-center text-[#6b7280] hover:text-[#111827] hover:bg-[#eef0f2] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-y-auto p-[16px] bg-[#f3f4f6]">
+        {!list.length ? (
+          <div className="text-center text-[13px] text-[#6b7280] py-[60px]">
+            {t('media_manager_empty', 'No media yet — insert from the library or design a new one above.')}
+          </div>
+        ) : (
+          <ReactSortable
+            list={list as any}
+            setList={(v) => commit(v as any)}
+            animation={200}
+            className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-[12px]"
+          >
+            {list.map((m, i) => (
+              <div
+                key={m.id}
+                tabIndex={0}
+                role="group"
+                aria-label={t(
+                  'media_manager_item',
+                  'Media {{n}} of {{total}} — Enter to edit, Delete to remove, H to hide/show, arrow keys to reorder'
+                )
+                  .replace('{{n}}', String(i + 1))
+                  .replace('{{total}}', String(list.length))}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    move(i, i - 1);
+                  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    move(i, i + 1);
+                  } else if (e.key === 'Enter' && !hasExtension(m.path, 'mp4')) {
+                    e.preventDefault();
+                    setEditing(m);
+                  } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                    e.preventDefault();
+                    remove(m.id);
+                  } else if (e.key === 'h' || e.key === 'H') {
+                    e.preventDefault();
+                    toggleHidden(m.id);
+                  }
+                }}
+                className={clsx(
+                  'relative group aspect-square rounded-[10px] border overflow-hidden bg-white cursor-grab focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  m.hidden ? 'border-amber-400' : 'border-[#e5e7eb]'
+                )}
+              >
+                <span className="absolute top-[6px] left-[6px] z-[5] bg-black/70 text-white text-[11px] font-[700] rounded-full min-w-[20px] h-[20px] px-[5px] flex items-center justify-center pointer-events-none">
+                  {i + 1}
+                </span>
+                {m.hidden && (
+                  <span className="absolute top-[6px] right-[6px] z-[5] bg-amber-500 text-white text-[10px] font-[700] rounded-full px-[7px] h-[20px] flex items-center justify-center pointer-events-none">
+                    {t('media_hidden_badge', 'Hidden')}
+                  </span>
+                )}
+                {hasExtension(m.path, 'mp4') ? (
+                  <video
+                    src={mediaDirectory.set(m.path)}
+                    muted
+                    playsInline
+                    className={clsx(
+                      'w-full h-full object-cover pointer-events-none',
+                      m.hidden && 'opacity-40'
+                    )}
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={mediaDirectory.set(m.path)}
+                    alt=""
+                    draggable={false}
+                    className={clsx(
+                      'w-full h-full object-cover pointer-events-none',
+                      m.hidden && 'opacity-40'
+                    )}
+                  />
+                )}
+                <div className="absolute inset-0 flex items-center justify-center gap-[10px] bg-black/45 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleHidden(m.id);
+                    }}
+                    title={
+                      m.hidden
+                        ? t('media_show', 'Show — include when publishing')
+                        : t('media_hide', 'Hide — keep visible here, exclude from publish')
+                    }
+                    aria-label={
+                      m.hidden ? t('media_show', 'Show — include when publishing') : t('media_hide', 'Hide — keep visible here, exclude from publish')
+                    }
+                    className="w-[32px] h-[32px] rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors"
+                  >
+                    {m.hidden ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M3 3l18 18M10.58 10.58a2 2 0 0 0 2.83 2.83M9.88 5.09A9.77 9.77 0 0 1 12 5c5 0 9 4.5 10 7-.32.9-1.02 2.06-2.06 3.15M6.53 6.53C4.6 7.8 3.14 9.8 2 12c1 2.5 5 7 10 7 1.35 0 2.6-.32 3.71-.84"
+                          stroke="#111827"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"
+                          stroke="#111827"
+                          strokeWidth="1.8"
+                          strokeLinejoin="round"
+                        />
+                        <circle cx="12" cy="12" r="3" stroke="#111827" strokeWidth="1.8" />
+                      </svg>
+                    )}
+                  </button>
+                  {!hasExtension(m.path, 'mp4') && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditing(m);
+                      }}
+                      title={t('edit_design', 'Edit / Design')}
+                      aria-label={t('edit_design', 'Edit / Design')}
+                      className="w-[32px] h-[32px] rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M4 20h4L18.5 9.5a2.121 2.121 0 0 0-3-3L5 17v3ZM13.5 6.5l4 4"
+                          stroke="#111827"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      remove(m.id);
+                    }}
+                    title={t('remove', 'Remove')}
+                    aria-label={t('remove', 'Remove')}
+                    className="w-[32px] h-[32px] rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M6 6l12 12M18 6L6 18"
+                        stroke="#dc2626"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </ReactSortable>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const MultiMediaComponent: FC<{
   label: string;
   description: string;
@@ -904,6 +1239,44 @@ export const MultiMediaComponent: FC<{
   // Nút "Design Media" LUÔN hiện — dùng Filerobot Image Editor (MIT, miễn phí,
   // không cần license key, không watermark). Xem filerobot.editor.tsx.
   const canDesign = true;
+  // Sua thang anh da dinh kem trong bai: mo Filerobot voi chinh anh do lam nguon,
+  // luu xong thay luon anh cu trong bai (khong phai vao thu vien chon lai).
+  const editAttachedMedia = useCallback(
+    (media: { id: string; path: string }) => (e: any) => {
+      e.stopPropagation();
+      modals.openModal({
+        askClose: false,
+        closeOnEscape: true,
+        removeLayout: true,
+        fullScreen: true,
+        children: (close) => (
+          <FilerobotEditor
+            source={mediaDirectory.set(media.path)}
+            setMedia={(edited) => {
+              const next = edited?.[0];
+              if (!next) {
+                return;
+              }
+              onChange({
+                target: {
+                  name: 'upload',
+                  value: (currentMedia || []).map((p) =>
+                    p.id === media.id ? { ...p, ...next } : p
+                  ),
+                },
+              });
+            }}
+            closeModal={close}
+          />
+        ),
+      });
+    },
+    [currentMedia, onChange, mediaDirectory]
+  );
+
+  // "Design Media" mở Trình quản lý media (grid + kéo-thả đổi thứ tự + sửa
+  // từng ảnh bằng Filerobot ngay tại chỗ) thay vì thẳng vào editor trắng —
+  // gộp 1 chỗ theo yêu cầu user (trước đây dải ảnh 40px vỡ trận khi đính 60 ảnh).
   const designMedia = useCallback(() => {
     if (!!user?.tier?.ai && !dummy) {
       modals.openModal({
@@ -911,15 +1284,21 @@ export const MultiMediaComponent: FC<{
         closeOnEscape: true,
         // removeLayout + fullScreen: bỏ thanh tiêu đề + padding + khoảng gap của
         // modal (thứ đẩy editor xuống + căn giữa gây lề chết trên/dưới + kẹp
-        // thanh công cụ khi zoom). Editor tự có header (tiêu đề + đóng).
+        // thanh công cụ khi zoom). MediaManagerModal tự có header (tiêu đề + đóng).
         removeLayout: true,
         fullScreen: true,
         children: (close) => (
-          <FilerobotEditor setMedia={changeMedia} closeModal={close} />
+          <MediaManagerModal
+            initialMedia={currentMedia || []}
+            onChange={(next) =>
+              onChange({ target: { name: 'upload', value: next } })
+            }
+            closeModal={close}
+          />
         ),
       });
     }
-  }, [changeMedia, t]);
+  }, [currentMedia, onChange, t]);
 
   return (
     <>
@@ -937,47 +1316,92 @@ export const MultiMediaComponent: FC<{
               handle=".dragging"
             >
               {currentMedia.map((media, index) => (
-                  <div key={media.id} className="cursor-pointer rounded-[5px] w-[40px] h-[40px] border-2 border-tableBorder relative flex transition-all">
+                  <div
+                    key={media.id}
+                    title={
+                      (media as any).hidden
+                        ? t('media_hidden_hint', 'Hidden — won\'t be published (open Design Media to show it again)')
+                        : undefined
+                    }
+                    className={clsx(
+                      'cursor-pointer rounded-[5px] w-[40px] h-[40px] border-2 relative flex transition-all',
+                      (media as any).hidden ? 'border-amber-400' : 'border-tableBorder'
+                    )}
+                  >
                     <DragHandleIcon className="z-[20] dragging absolute pe-[1px] pb-[3px] -start-[4px] -top-[4px] cursor-move" />
+                    {(media as any).hidden && (
+                      <span className="absolute -end-[4px] -bottom-[4px] z-[20] w-[14px] h-[14px] rounded-full bg-amber-400 border border-white" />
+                    )}
 
                     <div className="w-full h-full relative group">
-                      <div
-                        onClick={async () => {
-                          modals.openModal({
-                            title: t('media_settings', 'Media Settings'),
-                            children: (close) => (
-                              <MediaComponentInner
-                                media={media as any}
-                                onClose={close}
-                                onSelect={(value: any) => {
-                                  onChange({
-                                    target: {
-                                      name: 'upload',
-                                      value: currentMedia.map((p) => {
-                                        if (p.id === media.id) {
-                                          return {
-                                            ...p,
-                                            ...value,
-                                          };
-                                        }
-                                        return p;
-                                      }),
-                                    },
-                                  });
-                                }}
+                      <div className="absolute inset-0 flex items-center justify-center gap-[1px] bg-black/80 text-white rounded-[4px] opacity-0 group-hover:opacity-100 transition-opacity z-[9]">
+                        {!hasExtension(media?.path, 'mp4') && (
+                          <div
+                            onClick={editAttachedMedia(media)}
+                            title={t('edit_design', 'Edit / Design')}
+                            aria-label={t('edit_design', 'Edit / Design')}
+                            className="cursor-pointer relative z-[200] shrink-0"
+                          >
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4 20h4L18.5 9.5a2.121 2.121 0 0 0-3-3L5 17v3ZM13.5 6.5l4 4"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
-                            ),
-                          });
-                        }}
-                        className="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] bg-black/80 rounded-[10px] opacity-0 group-hover:opacity-100 transition-opacity z-[9]"
-                      >
-                        <MediaSettingsIcon className="cursor-pointer relative z-[200]" />
+                            </svg>
+                          </div>
+                        )}
+                        <div
+                          onClick={async () => {
+                            modals.openModal({
+                              title: t('media_settings', 'Media Settings'),
+                              children: (close) => (
+                                <MediaComponentInner
+                                  media={media as any}
+                                  onClose={close}
+                                  onSelect={(value: any) => {
+                                    onChange({
+                                      target: {
+                                        name: 'upload',
+                                        value: currentMedia.map((p) => {
+                                          if (p.id === media.id) {
+                                            return {
+                                              ...p,
+                                              ...value,
+                                            };
+                                          }
+                                          return p;
+                                        }),
+                                      },
+                                    });
+                                  }}
+                                />
+                              ),
+                            });
+                          }}
+                          title={t('media_settings', 'Media Settings')}
+                          aria-label={t('media_settings', 'Media Settings')}
+                          className="cursor-pointer relative z-[200] shrink-0"
+                        >
+                          <MediaSettingsIcon size={20} className="cursor-pointer" />
+                        </div>
                       </div>
                       {hasExtension(media?.path, 'mp4') ? (
                         <VideoFrame url={mediaDirectory.set(media?.path)} />
                       ) : (
                         <img
-                          className="w-full h-full object-cover rounded-[4px]"
+                          className={clsx(
+                            'w-full h-full object-cover rounded-[4px]',
+                            (media as any).hidden && 'opacity-40'
+                          )}
                           src={mediaDirectory.set(media?.path)}
                         />
                       )}

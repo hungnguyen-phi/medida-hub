@@ -36,6 +36,13 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     'business_management',
     'pages_manage_posts',
     'pages_read_engagement',
+    // Bắt buộc để ĐĂNG bình luận thay Trang (POST /{post-id}/comments) — tính
+    // năng "Add comment / post" (bình luận tự động sau bài chính). Trước đây
+    // THIẾU scope này: comment() vẫn được GỌI (isCommentable chỉ kiểm tra hàm
+    // có tồn tại, không kiểm tra quyền thật), Facebook âm thầm từ chối bằng
+    // permissions error — kênh vẫn đăng bài chính bình thường nên trông như
+    // "không có gì sai" dù bình luận chưa từng lên thật.
+    'pages_manage_engagement',
     'read_insights',
     'pages_read_user_content',
   ];

@@ -141,7 +141,7 @@ const FilerobotEditor: FC<{
           </svg>
           {t('upload_image_to_edit', 'Upload image to edit')}
         </button>
-        {source ? (
+        {source && (
           <button
             type="button"
             onClick={() => setSource(undefined)}
@@ -149,29 +149,7 @@ const FilerobotEditor: FC<{
           >
             {t('blank_canvas', 'Blank canvas')}
           </button>
-        ) : (
-          <span className="text-[12px] text-[#9ca3af] hidden sm:inline">
-            {t(
-              'filerobot_hint',
-              'Upload an image to edit, or design directly on a blank canvas'
-            )}
-          </span>
         )}
-        <button
-          type="button"
-          onClick={closeModal}
-          aria-label={t('close', 'Close')}
-          className="ms-auto shrink-0 w-[32px] h-[32px] rounded-[8px] flex items-center justify-center text-[#6b7280] hover:text-[#111827] hover:bg-[#eef0f2] transition-colors"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M6 6l12 12M18 6L6 18"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
       </div>
 
       {/* Vùng editor lấp đầy phần còn lại của modal. Nền xám nhạt để canvas

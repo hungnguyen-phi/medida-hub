@@ -13,16 +13,16 @@ import {
   PrimaryButton,
   SimpleButton,
   StatusChip,
-  textareaCls,
   Toggle,
-  ZaloGroup,
 } from './zalo.shared';
 
 // ============================================================================
 //  Tab "Cài đặt" — thay tab Settings của dashboard bot: tạm dừng nhận ảnh,
-//  lọc nhóm hiển thị (allowlist), tài khoản Zalo (QR / kết nối lại / đăng xuất
-//  giữ-hay-xoá dữ liệu). Key & model Claude nằm ở Settings CHUNG (tự đồng bộ
-//  sang bot). + Tab "Nhật ký" (log hoạt động của bot).
+//  tài khoản Zalo (QR / kết nối lại / đăng xuất giữ-hay-xoá dữ liệu). Key &
+//  model Claude nằm ở Settings CHUNG (tự đồng bộ sang bot). + Tab "Nhật ký"
+//  (log hoạt động của bot).
+//  (2026-09-22: bỏ tính năng "Lọc nhóm hiển thị"/groupAllowlist theo yêu cầu
+//  user — dropdown chọn nhóm ở tab Nhóm→Trang giờ luôn hiện ĐỦ mọi nhóm.)
 // ============================================================================
 
 export const ZaloSettingsTab: FC<{ onChanged?: () => void }> = ({ onChanged }) => {
@@ -40,10 +40,6 @@ export const ZaloSettingsTab: FC<{ onChanged?: () => void }> = ({ onChanged }) =
     hasCreds?: boolean;
     qr?: boolean;
   } | null>(null);
-  const [allowText, setAllowText] = useState('');
-  const [allGroups, setAllGroups] = useState<ZaloGroup[] | null>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [qrTick, setQrTick] = useState(0);
 
   const load = useCallback(async () => {
@@ -51,7 +47,15 @@ export const ZaloSettingsTab: FC<{ onChanged?: () => void }> = ({ onChanged }) =
       const st = await bot('/api/status');
       if (st?.settings) {
         setSettings(st.settings);
-        setAllowText(((st.settings.groupAllowlist || []) as string[]).join('\n'));
+        // Tính năng "Lọc nhóm hiển thị" đã bỏ (2026-09-22, yêu cầu user): dropdown
+        // chọn nhóm ở tab Nhóm→Trang luôn hiện ĐỦ mọi nhóm. Nếu trước đó đã lưu
+        // allowlist thì tự xoá 1 lần ở đây để không còn ai bị lọc ngầm.
+        if ((st.settings.groupAllowlist || []).length) {
+          bot('/api/settings', {
+            method: 'POST',
+            body: JSON.stringify({ groupAllowlist: [] }),
+          }).catch(() => {});
+        }
       }
     } catch {
       /* bot chưa phản hồi */
@@ -82,24 +86,6 @@ export const ZaloSettingsTab: FC<{ onChanged?: () => void }> = ({ onChanged }) =
     },
     [onChanged, t]
   );
-
-  // Xem mã tất cả nhóm — không cần mật khẩu nữa (request đã qua đăng nhập Hub).
-  const revealGroups = useCallback(async () => {
-    setBusy(true);
-    try {
-      const r = await bot(
-        '/api/zalo/groups/reveal',
-        { method: 'POST', body: '{}' },
-        120000
-      );
-      if (Array.isArray(r)) setAllGroups(r);
-      else toast.show(r?.error || t('zalo_error', 'Error'), 'warning');
-    } catch {
-      toast.show(t('zalo_bot_unreachable', 'Cannot reach the Zalo bot'), 'warning');
-    } finally {
-      setBusy(false);
-    }
-  }, [t]);
 
   const logout = useCallback(
     async (wipe: boolean) => {
@@ -143,66 +129,6 @@ export const ZaloSettingsTab: FC<{ onChanged?: () => void }> = ({ onChanged }) =
           <Toggle on={!!settings.paused} onChange={() => setS({ paused: !settings.paused })} />
           <b className="text-[13.5px]">{t('zalo_settings_pause', 'Tạm dừng nhận ảnh (mọi nhóm)')}</b>
         </label>
-
-        <div
-          onClick={() => setFilterOpen((v) => !v)}
-          className="border-t border-newTableBorder pt-[10px] flex items-center justify-between cursor-pointer mobile:min-h-[44px]"
-        >
-          <b className="text-[13px]">{t('zalo_settings_group_filter', 'Lọc nhóm hiển thị')}</b>
-          <span className="text-[11.5px] text-textItemBlur">
-            {(settings.groupAllowlist || []).length
-              ? t('zalo_settings_filtering_n', 'đang lọc {{n}} nhóm').replace('{{n}}', String((settings.groupAllowlist || []).length))
-              : t('zalo_settings_show_all', 'hiện tất cả')}{' '}
-            {filterOpen ? '▾' : '▸'}
-          </span>
-        </div>
-        {filterOpen && (
-          <div className="flex flex-col gap-[8px]">
-            <div className="text-[12px] text-textItemBlur leading-[1.6]">
-              {t(
-                'zalo_settings_filter_hint',
-                'Liệt kê ID nhóm muốn HIỆN (mỗi dòng một ID) — bộ chọn chỉ hiện các nhóm này. Để trống = hiện tất cả.'
-              )}
-            </div>
-            <textarea rows={4} value={allowText} onChange={(e) => setAllowText(e.target.value)} className={textareaCls} placeholder="threadId…" />
-            {/* Mobile: xếp dọc — input full bề ngang, 2 nút to dễ bấm */}
-            <div className="flex items-center gap-[10px] flex-wrap mobile:flex-col mobile:items-stretch mobile:gap-[8px]">
-              <PrimaryButton
-                className="!h-[34px] mobile:!h-[44px] text-[13px]"
-                onClick={() =>
-                  setS(
-                    { groupAllowlist: allowText.split('\n').map((x) => x.trim()).filter(Boolean) },
-                    t('zalo_settings_filter_saved', 'Group filter saved')
-                  )
-                }
-              >
-                {t('zalo_settings_save_filter', 'Save filter')}
-              </PrimaryButton>
-              <SimpleButton className="!h-[34px] mobile:!h-[44px] text-[13px]" disabled={busy} onClick={revealGroups}>
-                {t('zalo_settings_reveal', 'Show ALL group IDs')}
-              </SimpleButton>
-            </div>
-            {allGroups && (
-              <div className="max-h-[220px] overflow-y-auto scrollbar scrollbar-thumb-newColColor scrollbar-track-newBgColorInner border border-newTableBorder rounded-[8px] p-[8px] flex flex-col gap-[2px]">
-                {allGroups.map((g) => (
-                  <div key={g.threadId} className="flex justify-between gap-[10px] text-[12.5px] py-[3px] mobile:py-[8px]">
-                    <span className="truncate">{g.name}</span>
-                    <code
-                      onClick={() => {
-                        navigator.clipboard?.writeText(g.threadId);
-                        toast.show(t('zalo_settings_copied', 'Copied'), 'success');
-                      }}
-                      className="text-textItemBlur cursor-pointer shrink-0"
-                      title={t('zalo_settings_click_copy', 'Click to copy')}
-                    >
-                      {g.threadId}
-                    </code>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </Card>
 
       {/* Tài khoản Zalo */}

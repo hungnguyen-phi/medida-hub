@@ -60,6 +60,37 @@ export const isSupportedChannel = (identifier: string) =>
   BOT_SUPPORTED_PROVIDERS.has(identifier) ||
   BOT_SUPPORTED_PROVIDERS.has(String(identifier || '').split('-')[0]);
 
+// Tên nền tảng hiển thị cạnh tên kênh trong các ô chọn kênh (nhiều kênh trùng
+// tên khác nền tảng — không có chữ này thì không phân biệt được).
+const PROVIDER_LABELS: Record<string, string> = {
+  facebook: 'Facebook',
+  linkedin: 'LinkedIn',
+  'linkedin-page': 'LinkedIn Page',
+  threads: 'Threads',
+  mastodon: 'Mastodon',
+  bluesky: 'Bluesky',
+  telegram: 'Telegram',
+  x: 'X',
+  vk: 'VK',
+  gmb: 'Google Business',
+  farcaster: 'Farcaster',
+  wrapcast: 'Warpcast',
+  kick: 'Kick',
+  twitch: 'Twitch',
+  tiktok: 'TikTok',
+  mewe: 'MeWe',
+  nostr: 'Nostr',
+  listmonk: 'Listmonk',
+};
+
+export const channelLabel = (ch: { name: string; id: string; identifier: string }) => {
+  const platform =
+    PROVIDER_LABELS[ch.identifier] ||
+    PROVIDER_LABELS[String(ch.identifier || '').split('-')[0]] ||
+    ch.identifier;
+  return `${ch.name || ch.id} · ${platform}`;
+};
+
 // ---- Kiểu dữ liệu từ bot ---------------------------------------------------
 
 export type Overview = {
