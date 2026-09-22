@@ -1,0 +1,25 @@
+{
+  "name": "zalo-group-autopost",
+  "version": "0.0.1",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node --env-file=.env src/service.mjs",
+    "groups": "node scripts/list-groups.mjs",
+    "gbp:login": "node --env-file=.env scripts/gbp-login.mjs",
+    "recover": "node --env-file=.env scripts/recover.mjs",
+    "test": "node test/extract.test.mjs && node test/batcher.test.mjs && node test/curate.test.mjs && node test/format.test.mjs && node test/caption.test.mjs && node test/config.test.mjs && node test/gbp.test.mjs && node test/pipeline.test.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^3.0.7",
+    "playwright": "^1.61.1",
+    "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.35.2",
+    "zca-js": "^2.1.2"
+  }
+}

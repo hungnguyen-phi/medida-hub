@@ -1,0 +1,40 @@
+name: CI
+
+# Chạy mỗi khi mở/cập nhật Pull Request hoặc push lên main.
+# Mục tiêu: chặn code lỗi trước khi merge → trước khi Coolify auto-deploy.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      # Test không cần trình duyệt — đừng tải Chromium (~130MB) cho nhanh.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cài Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Cài dependencies
+        run: npm ci
+
+      - name: Kiểm tra cú pháp mọi file .mjs
+        run: |
+          for f in $(git ls-files '*.mjs'); do
+            echo "check $f"
+            node --check "$f" || exit 1
+          done
+
+      - name: Test phần lõi (offline, không cần API key/mạng)
+        run: |
+          node test/extract.test.mjs
+          node test/batcher.test.mjs
+          node test/curate.test.mjs
+          node test/config.test.mjs
